@@ -20,6 +20,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="SkinDetector.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SkinDetector.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C497FDDC-AB6E-43DD-976D-6794158A0D90}</ProjectGuid>
