@@ -19,10 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="FaceDetector.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SkinDetector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FaceDetector.h" />
     <ClInclude Include="SkinDetector.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

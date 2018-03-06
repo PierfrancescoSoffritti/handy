@@ -11,10 +11,7 @@ SkinDetector::SkinDetector(void) {
 	Cb_MAX = 127;
 }
 
-SkinDetector::~SkinDetector(void) {
-}
-
-cv::Mat SkinDetector::getSkin(cv::Mat input) {
+cv::Mat SkinDetector::detectSkin(cv::Mat input) {
 	cv::Mat skin;
 
 	cv::cvtColor(input, skin, cv::COLOR_BGR2YCrCb);

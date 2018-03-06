@@ -5,9 +5,8 @@
 class SkinDetector {
 	public:
 		SkinDetector(void);
-		~SkinDetector(void);
 
-		cv::Mat getSkin(cv::Mat input);
+		cv::Mat detectSkin(cv::Mat input);
 
 	private:
 		int Y_MIN;
