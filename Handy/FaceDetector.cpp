@@ -77,12 +77,11 @@ Mat getSkinInstogramFromFace(Mat input, int bins) {
 	the second array channels are counted from images[0].channels() to images[0].channels() + images[1].channels()-1,
 	and so on.
 	*/
-	int channels[] = { 1,0 };
+	int channels[] = { 0, 1 };
 
 	Mat histogram;
-	float hue_range[] = { 100, 200 };
-	float saturation_range[] = { 0, 180 };
-	const float* ranges[] = { hue_range, saturation_range };
+	float hue_range[] = { 120, 200 };
+	const float* ranges[] = { hue_range };
 
 	// Get the Histogram and normalize it
 	calcHist(&input, 1, channels, Mat(), histogram, 1, &bins, ranges, true, false);
