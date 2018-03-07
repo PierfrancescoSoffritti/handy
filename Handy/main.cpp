@@ -33,6 +33,9 @@ int main(int, char**) {
 	while (true) {
 		videoCapture >> frame;
 
+		cvtColor(frame, frame, COLOR_BGR2YCrCb);
+		//cvtColor(frame, frame, CV_BGR2HSV);
+
 		//frame = skinDetector.detectSkin(frame);
 		//faceDetector.detectFaces(frame, frame);
 		
@@ -53,8 +56,7 @@ int main(int, char**) {
 }
 
 Mat getBackProjection(Mat input, Mat histogram) {
-	Mat hsv;
-	cvtColor(input, hsv, COLOR_BGR2YCrCb);
+	Mat hsv = input;
 	int ch[] = { 1,0 };
 
 	float hue_range[] = { 100, 200 };
