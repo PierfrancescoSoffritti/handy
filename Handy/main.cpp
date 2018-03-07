@@ -12,6 +12,7 @@ using namespace cv;
 using namespace std;
 
 Mat getHistogram(Mat in, Mat out, int bins);
+Mat getBackProjection(Mat in, Mat histogram);
 
 int main(int, char**) {
 	String windowName = "videoCapture";
@@ -23,7 +24,7 @@ int main(int, char**) {
 		return -1;
 
 	namedWindow(windowName, 1);
-	namedWindow(windowNameHistogram, 1);
+	//namedWindow(windowNameHistogram, 1);
 	Mat frame;
 
 	SkinDetector skinDetector;
@@ -34,16 +35,36 @@ int main(int, char**) {
 
 		//frame = skinDetector.detectSkin(frame);
 		//faceDetector.detectFaces(frame, frame);
-		Mat histogram;
-		histogram = getHistogram(frame, histogram, 25);
+		
+		//Mat histogram;
+		//histogram = getHistogram(frame, histogram, 25);
+
+		Mat skinHistogram = faceDetector.getSkinHistogram(frame);
+
+		frame = getBackProjection(frame, skinHistogram);
 
 		imshow(windowName, frame);
-		imshow(windowNameHistogram, histogram);
+		//imshow(windowNameHistogram, histogram);
 		
 		if (waitKey(1) >= 0) break;
 	}
 
 	return 0;
+}
+
+Mat getBackProjection(Mat input, Mat histogram) {
+	Mat hsv;
+	cvtColor(input, hsv, COLOR_BGR2YCrCb);
+	int ch[] = { 1,0 };
+
+	float hue_range[] = { 100, 200 };
+	float saturation_range[] = { 0, 180 };
+	const float* ranges[] = { hue_range, saturation_range };
+
+	Mat backproj;
+	calcBackProject(&hsv, 1, ch, histogram, backproj, ranges, 1, true);
+
+	return backproj;
 }
 
 Mat getHistogram(Mat in, Mat out, int bins) {
