@@ -33,7 +33,7 @@ int main(int, char**) {
 	while (true) {
 		videoCapture >> frame;
 
-		//cvtColor(frame, frame, COLOR_BGR2YCrCb);
+		cvtColor(frame, frame, COLOR_BGR2YCrCb);
 		//cvtColor(frame, frame, CV_BGR2HSV);
 
 		//frame = skinDetector.detectSkin(frame);
@@ -56,16 +56,28 @@ int main(int, char**) {
 }
 
 Mat getBackProjection(Mat input, Mat histogram) {
-	Mat hsv = input;
-	int channels[] = { 0, 1 };
+	/*
+	int numImages = 1;
+	int channels[] = { 0 };
 
-	float hue_range[] = { 120, 200 };
-	const float* ranges[] = { hue_range };
+	float range[] = { 120, 200 };
+	const float* ranges[] = { range };
+	*/
 
-	Mat backproj;
-	calcBackProject(&hsv, 1, channels, histogram, backproj, ranges, 1, true);
+	int numImages = 1;
+	int dims = 2;
+	const int sizes[] = { 256,256,256 };
+	const int channels[] = { 0,1 };
+	float rRange[] = { 140,200 };
+	float gRange[] = { 140,200 };
+	float bRange[] = { 0,256 };
+	const float *ranges[] = { rRange,gRange,bRange };
+	Mat mask = Mat();
 
-	return backproj;
+	Mat backProjection;
+	calcBackProject(&input, numImages, channels, histogram, backProjection, ranges);
+
+	return backProjection;
 }
 
 Mat getHistogram(Mat in, Mat out, int bins) {

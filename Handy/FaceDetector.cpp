@@ -72,22 +72,31 @@ Rect getFaceRect(Mat input) {
 
 Mat getSkinInstogramFromFace(Mat input, int bins) {
 	/*
-	List of the dims channels used to compute the histogram.
-	The first array channels are numerated from 0 to images[0].channels()-1,
-	the second array channels are counted from images[0].channels() to images[0].channels() + images[1].channels()-1,
-	and so on.
+	int numImages = 1;
+	int channels[] = { 0 };
+	Mat mask = Mat();
+	int dims = 1;
+
+	float range[] = { 120, 200 };
+	const float* ranges[] = { range };
 	*/
-	int channels[] = { 0, 1 };
+	
+	int numImages = 1;
+	int dims = 2;
+	const int sizes[] = { 256,256,256 };
+	const int channels[] = { 0,1 };
+	float rRange[] = { 140,200 };
+	float gRange[] = { 140,200 };
+	float bRange[] = { 0,256 };
+	const float *ranges[] = { rRange,gRange,bRange };
+	Mat mask = Mat();
 
 	Mat histogram;
-	float hue_range[] = { 120, 200 };
-	const float* ranges[] = { hue_range };
+	calcHist(&input, numImages, channels, mask, histogram, dims, &bins, ranges);
 
-	// Get the Histogram and normalize it
-	calcHist(&input, 1, channels, Mat(), histogram, 1, &bins, ranges, true, false);
-	normalize(histogram, histogram, 0, 255, NORM_MINMAX, -1, Mat());
+	normalize(histogram, histogram, 200, 250, NORM_MINMAX, -1, Mat());
 
-	drawHistogram(histogram, bins);
+	//drawHistogram(histogram, bins);
 
 	return histogram;
 }
