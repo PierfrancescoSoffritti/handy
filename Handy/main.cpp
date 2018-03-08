@@ -15,16 +15,11 @@ Mat getHistogram(Mat in, Mat out, int bins);
 Mat getBackProjection(Mat in, Mat histogram);
 
 int main(int, char**) {
-	String windowName = "videoCapture";
-	String windowNameHistogram = "histogram";
-
 	VideoCapture videoCapture(0);
 	
 	if (!videoCapture.isOpened())
 		return -1;
 
-	namedWindow(windowName, 1);
-	//namedWindow(windowNameHistogram, 1);
 	Mat frame;
 
 	SkinDetector skinDetector;
@@ -33,46 +28,40 @@ int main(int, char**) {
 	while (true) {
 		videoCapture >> frame;
 
-		cvtColor(frame, frame, COLOR_BGR2YCrCb);
-		//cvtColor(frame, frame, CV_BGR2HSV);
+		//cvtColor(frame, frame, COLOR_BGR2YCrCb);
+		cvtColor(frame, frame, CV_BGR2HSV);
 
-		//frame = skinDetector.detectSkin(frame);
-		//faceDetector.detectFaces(frame, frame);
+		skinDetector.drawRect(frame);
+		
+		faceDetector.detectFaces(frame, frame);
+		frame = skinDetector.detectSkin(frame);
 		
 		//Mat histogram;
 		//histogram = getHistogram(frame, histogram, 25);
 
-		Mat skinHistogram = faceDetector.getSkinHistogram(frame);
+		//Mat skinHistogram = faceDetector.getSkinHistogram(frame);
+		//frame = getBackProjection(frame, skinHistogram);	
 
-		frame = getBackProjection(frame, skinHistogram);
-
-		imshow(windowName, frame);
-		//imshow(windowNameHistogram, histogram);
+		imshow("frame", frame);
 		
-		if (waitKey(1) >= 0) break;
+		int key = waitKey(1);
+
+		if (key == 27)
+			break;
+		else if(key > 0)
+			skinDetector.calibrate(frame);
 	}
 
 	return 0;
 }
 
 Mat getBackProjection(Mat input, Mat histogram) {
-	/*
+	
 	int numImages = 1;
 	int channels[] = { 0 };
 
 	float range[] = { 120, 200 };
 	const float* ranges[] = { range };
-	*/
-
-	int numImages = 1;
-	int dims = 2;
-	const int sizes[] = { 256,256,256 };
-	const int channels[] = { 0,1 };
-	float rRange[] = { 140,200 };
-	float gRange[] = { 140,200 };
-	float bRange[] = { 0,256 };
-	const float *ranges[] = { rRange,gRange,bRange };
-	Mat mask = Mat();
 
 	Mat backProjection;
 	calcBackProject(&input, numImages, channels, histogram, backProjection, ranges);

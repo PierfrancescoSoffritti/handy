@@ -28,10 +28,12 @@ void FaceDetector::detectFaces(Mat input, Mat output) {
 	face_cascade.detectMultiScale(frame_gray, faces, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(120, 120));
 
 	for (size_t i = 0; i < faces.size(); i++) {
-		rectangle(output,
+		rectangle(
+			output,
 			Point(faces[i].x, faces[i].y),
 			Point(faces[i].x + faces[i].width, faces[i].y + faces[i].height),
-			Scalar(255, 0, 255)
+			Scalar(0, 0, 0),
+			-1
 		);
 	}
 }
@@ -40,7 +42,7 @@ Mat FaceDetector::getSkinHistogram(Mat input) {
 	Rect faceRect = getFaceRect(input);
 
 	Mat face = Mat(input, faceRect);
-	//imshow("face", face);
+	imshow("face", face);
 
 	Mat skinHistogram = getSkinInstogramFromFace(face, 25);
 
@@ -71,7 +73,7 @@ Rect getFaceRect(Mat input) {
 }
 
 Mat getSkinInstogramFromFace(Mat input, int bins) {
-	/*
+	
 	int numImages = 1;
 	int channels[] = { 0 };
 	Mat mask = Mat();
@@ -79,24 +81,12 @@ Mat getSkinInstogramFromFace(Mat input, int bins) {
 
 	float range[] = { 120, 200 };
 	const float* ranges[] = { range };
-	*/
-	
-	int numImages = 1;
-	int dims = 2;
-	const int sizes[] = { 256,256,256 };
-	const int channels[] = { 0,1 };
-	float rRange[] = { 140,200 };
-	float gRange[] = { 140,200 };
-	float bRange[] = { 0,256 };
-	const float *ranges[] = { rRange,gRange,bRange };
-	Mat mask = Mat();
 
 	Mat histogram;
 	calcHist(&input, numImages, channels, mask, histogram, dims, &bins, ranges);
+	normalize(histogram, histogram, 0, 255, NORM_MINMAX, -1, Mat());
 
-	normalize(histogram, histogram, 200, 250, NORM_MINMAX, -1, Mat());
-
-	//drawHistogram(histogram, bins);
+	drawHistogram(histogram, bins);
 
 	return histogram;
 }

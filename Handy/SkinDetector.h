@@ -2,11 +2,16 @@
 
 #include<opencv\cv.h>
 
+using namespace cv;
+using namespace std;
+
 class SkinDetector {
 	public:
 		SkinDetector(void);
 
-		cv::Mat detectSkin(cv::Mat input);
+		void drawRect(Mat input);
+		void calibrate(Mat input);
+		Mat detectSkin(Mat input);		
 
 	private:
 		int Y_MIN;
