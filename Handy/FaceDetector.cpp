@@ -17,7 +17,7 @@ FaceDetector::FaceDetector(void) {
 		throw runtime_error("can't load file " + face_cascade_name);
 }
 
-void FaceDetector::detectFaces(Mat input, Mat output) {
+void FaceDetector::removeFaces(Mat input, Mat output) {
 	vector<Rect> faces;
 	Mat frame_gray;
 

@@ -21,6 +21,7 @@ int main(int, char**) {
 		return -1;
 
 	Mat frame;
+	Mat skinMask;
 
 	SkinDetector skinDetector;
 	FaceDetector faceDetector;
@@ -28,21 +29,24 @@ int main(int, char**) {
 	while (true) {
 		videoCapture >> frame;
 
-		//cvtColor(frame, frame, COLOR_BGR2YCrCb);
 		cvtColor(frame, frame, CV_BGR2HSV);
-
+		
+		faceDetector.removeFaces(frame, frame);
 		skinDetector.drawRect(frame);
+		skinMask = skinDetector.detectSkin(frame);
 		
-		faceDetector.detectFaces(frame, frame);
-		frame = skinDetector.detectSkin(frame);
-		
-		//Mat histogram;
-		//histogram = getHistogram(frame, histogram, 25);
+		/*
+		Mat histogram;
+		histogram = getHistogram(frame, histogram, 25);
 
-		//Mat skinHistogram = faceDetector.getSkinHistogram(frame);
-		//frame = getBackProjection(frame, skinHistogram);	
+		Mat skinHistogram = faceDetector.getSkinHistogram(frame);
+		frame = getBackProjection(frame, skinHistogram);	
+		*/
 
 		imshow("frame", frame);
+		imshow("skinMask", skinMask);
+
+		// do hand detection here
 		
 		int key = waitKey(1);
 

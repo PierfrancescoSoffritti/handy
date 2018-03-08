@@ -63,18 +63,17 @@ Mat SkinDetector::detectSkin(Mat input) {
 	if (Y_MIN == 0)
 		return input;
 
-	//Mat skin;
-	//cvtColor(input, input, COLOR_BGR2YCrCb);
+	Mat skin;
 
 	//filter the image in YCrCb color space
-	inRange(input, Scalar(Y_MIN, Cr_MIN, Cb_MIN), Scalar(Y_MAX, Cr_MAX, Cb_MAX), input);
+	inRange(input, Scalar(Y_MIN, Cr_MIN, Cb_MIN), Scalar(Y_MAX, Cr_MAX, Cb_MAX), skin);
 
 	Mat kernel = getStructuringElement(MORPH_ELLIPSE, { 11, 11 });
-	erode(input, input, kernel, Point(-1,-1), 1);
-	dilate(input, input, kernel, Point(-1, -1), 1);
+	erode(skin, skin, kernel, Point(-1,-1), 1);
+	dilate(skin, skin, kernel, Point(-1, -1), 1);
 
-	GaussianBlur(input, input, { 3, 3 }, 0);
-	bitwise_and(input, input, input);
+	GaussianBlur(skin, skin, { 3, 3 }, 0);
+	bitwise_and(skin, skin, skin);
 
-	return input;
+	return skin;
 }
