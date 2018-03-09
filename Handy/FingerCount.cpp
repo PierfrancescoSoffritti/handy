@@ -22,7 +22,7 @@ cv::Mat FingerCount::findHandContours(cv::Mat input) {
 	Mat contours_image = Mat::zeros(input.size(), CV_8UC3);
 
 	// we work only on the 1 channel result, since this function is called inside a loop we are not sure that this is always the case
-	if (input.channels() != 1) 
+	if (input.channels() != 1)
 		return contours_image;
 
 	// find contours
@@ -30,14 +30,15 @@ cv::Mat FingerCount::findHandContours(cv::Mat input) {
 	vector<Vec4i> hierarchy;
 
 	findContours(input, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
-	
+
 	if (contours.size() <= 0)
 		throw runtime_error("Contours size is negative?!\n");
 
 	// find the convex hull object for each contour and the defects, two different data structure are needed by the OpenCV api
 	vector<vector<Point>> hulls_point(contours.size()); // for drawing the hulls
-	vector<vector<int> > hulls_int(contours.size()); // for finding the defects
+	vector<vector<int>> hulls_int(contours.size()); // for finding the defects
 	vector<vector<Vec4i>> defects(contours.size());
+	vector<Rect> bound_rectangle(contours.size()); // for filtering defects
 
 	for (int i = 0; i < contours.size(); i++) {
 		convexHull(Mat(contours[i]), hulls_point[i], false);
@@ -45,6 +46,9 @@ cv::Mat FingerCount::findHandContours(cv::Mat input) {
 		// is this if really needed? check
 		if (hulls_int[i].size() > 3)
 			convexityDefects(contours[i], hulls_int[i], defects[i]);
+
+		// we bound the convex hull
+		bound_rectangle[i] = boundingRect(Mat(hulls_point[i]));
 	}
 
 	// find the biggest contour (let's suppose it's our hand)
@@ -91,8 +95,11 @@ cv::Mat FingerCount::findHandContours(cv::Mat input) {
 			circle(contours_image, far_points, 5, color_red, 2, 8);
 		}
 
+		// we draw the bounding rectangle
+		rectangle(contours_image, bound_rectangle[biggest_contour_index].tl(), bound_rectangle[biggest_contour_index].br(), color_red, 2, 8, 0);
+
 		// TODO: filter out the irrelevant defects
-	}
+	}	
 	else {
 		throw runtime_error("Could not find the biggest contour!\n");
 	}
