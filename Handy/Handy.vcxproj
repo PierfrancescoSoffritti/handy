@@ -20,11 +20,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FaceDetector.cpp" />
+    <ClCompile Include="FingerCount.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SkinDetector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FaceDetector.h" />
+    <ClInclude Include="FingerCount.h" />
     <ClInclude Include="SkinDetector.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -112,12 +114,12 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Pierfrancesco\Documents\opencv\build\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\nicolo\Documents\opencv\build\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\Pierfrancesco\Documents\opencv\build\x64\vc14\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\nicolo\Documents\opencv\build\x64\vc14\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>opencv_world341d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

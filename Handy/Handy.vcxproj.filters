@@ -24,12 +24,18 @@
     <ClCompile Include="FaceDetector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FingerCount.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SkinDetector.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="FaceDetector.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FingerCount.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

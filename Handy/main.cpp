@@ -5,8 +5,9 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/video.hpp>
 
-#include"SkinDetector.h"
-#include"FaceDetector.h"
+#include "SkinDetector.h"
+#include "FaceDetector.h"
+#include "FingerCount.h"
 
 using namespace cv;
 using namespace std;
@@ -17,14 +18,18 @@ Mat getBackProjection(Mat in, Mat histogram);
 int main(int, char**) {
 	VideoCapture videoCapture(0);
 	
-	if (!videoCapture.isOpened())
+	if (!videoCapture.isOpened()) {
+		cout << "Can't find camera!" << endl;
 		return -1;
+	}
 
 	Mat frame;
 	Mat skinMask;
+	Mat contourImage;
 
 	SkinDetector skinDetector;
 	FaceDetector faceDetector;
+	FingerCount fingerCount;
 
 	while (true) {
 		videoCapture >> frame;
@@ -34,6 +39,7 @@ int main(int, char**) {
 		faceDetector.removeFaces(frame, frame);
 		skinDetector.drawRect(frame);
 		skinMask = skinDetector.detectSkin(frame);
+		contourImage = fingerCount.findHandContours(skinMask);
 		
 		/*
 		Mat histogram;
@@ -45,9 +51,8 @@ int main(int, char**) {
 
 		imshow("frame", frame);
 		imshow("skinMask", skinMask);
+		imshow("hand contour", contourImage);
 
-		// do hand detection here
-		
 		int key = waitKey(1);
 
 		if (key == 27)
