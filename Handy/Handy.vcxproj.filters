@@ -29,14 +29,14 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SkinDetector.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="FaceDetector.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SkinDetector.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FingerCount.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
