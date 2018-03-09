@@ -64,8 +64,6 @@ Mat SkinDetector::detectSkin(Mat input) {
 		return input;
 
 	Mat skin;
-
-	//filter the image in YCrCb color space
 	inRange(input, Scalar(Y_MIN, Cr_MIN, Cb_MIN), Scalar(Y_MAX, Cr_MAX, Cb_MAX), skin);
 
 	Mat kernel = getStructuringElement(MORPH_ELLIPSE, { 11, 11 });

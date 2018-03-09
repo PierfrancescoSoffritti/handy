@@ -30,6 +30,7 @@ int main(int, char**) {
 		videoCapture >> frame;
 
 		cvtColor(frame, frame, CV_BGR2HSV);
+		//cvtColor(frame, frame, CV_BGR2YCrCb);
 		
 		faceDetector.removeFaces(frame, frame);
 		skinDetector.drawRect(frame);
