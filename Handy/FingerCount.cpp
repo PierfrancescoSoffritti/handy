@@ -98,7 +98,8 @@ cv::Mat FingerCount::findHandContours(cv::Mat input) {
 		// we draw the bounding rectangle
 		rectangle(contours_image, bound_rectangle[biggest_contour_index].tl(), bound_rectangle[biggest_contour_index].br(), color_red, 2, 8, 0);
 
-		// TODO: filter out the irrelevant defects
+		/* TODO: now we have all the info needed to filter out the defects, we need to find the angle (or the distance)
+		between the neighbouring vertices of the hull and the defects and then deciding if they are usefull or not.. */
 	}	
 	else {
 		throw runtime_error("Could not find the biggest contour!\n");
