@@ -13,6 +13,7 @@ cv::Mat FingerCount::findHandContours(cv::Mat input) {
 	Scalar color_green(0, 255, 0);
 	Scalar color_red(0, 0, 255);
 	Scalar color_white(255, 255, 255);
+	Scalar color_yellow(0, 255, 255);
 
 	// check if the source image is good
 	if (input.empty())
@@ -38,7 +39,7 @@ cv::Mat FingerCount::findHandContours(cv::Mat input) {
 	vector<vector<Point>> hulls_point(contours.size()); // for drawing the hulls
 	vector<vector<int>> hulls_int(contours.size()); // for finding the defects
 	vector<vector<Vec4i>> defects(contours.size());
-	vector<Rect> bound_rectangle(contours.size()); // for filtering defects
+	vector<Rect> bounding_rectangle(contours.size()); // for filtering defects
 
 	for (int i = 0; i < contours.size(); i++) {
 		convexHull(Mat(contours[i]), hulls_point[i], false);
@@ -48,7 +49,7 @@ cv::Mat FingerCount::findHandContours(cv::Mat input) {
 			convexityDefects(contours[i], hulls_int[i], defects[i]);
 
 		// we bound the convex hull
-		bound_rectangle[i] = boundingRect(Mat(hulls_point[i]));
+		bounding_rectangle[i] = boundingRect(Mat(hulls_point[i]));
 	}
 
 	// find the biggest contour (let's suppose it's our hand)
@@ -96,10 +97,18 @@ cv::Mat FingerCount::findHandContours(cv::Mat input) {
 		}
 
 		// we draw the bounding rectangle
-		rectangle(contours_image, bound_rectangle[biggest_contour_index].tl(), bound_rectangle[biggest_contour_index].br(), color_red, 2, 8, 0);
+		rectangle(contours_image, bounding_rectangle[biggest_contour_index].tl(), bounding_rectangle[biggest_contour_index].br(), color_red, 2, 8, 0);
 
 		/* TODO: now we have all the info needed to filter out the defects, we need to find the angle (or the distance)
 		between the neighbouring vertices of the hull and the defects and then deciding if they are usefull or not.. */
+
+		// we find the center of the bounding rectangle, this should approximately also be the center of the hand
+		Point center_bounding_rect(
+			(bounding_rectangle[biggest_contour_index].tl().x + bounding_rectangle[biggest_contour_index].br().x)/2, 
+			(bounding_rectangle[biggest_contour_index].tl().y + bounding_rectangle[biggest_contour_index].br().y)/2
+		);
+		circle(contours_image, center_bounding_rect, 5, color_yellow, 2, 8);
+
 	}	
 	else {
 		throw runtime_error("Could not find the biggest contour!\n");
