@@ -35,12 +35,20 @@ int main(int, char**) {
 		videoCapture >> frame;
 
 		cvtColor(frame, frame, CV_BGR2HSV);
+
+		imshow("frameNoblur", frame);
+
+		Mat kernel = getStructuringElement(MORPH_ELLIPSE, { 4, 4 });
+		erode(frame, frame, kernel, Point(-1, -1), 3);
+		dilate(frame, frame, kernel, Point(-1, -1), 2);
+		GaussianBlur(frame, frame, { 3, 3 }, 0);
+
 		//cvtColor(frame, frame, CV_BGR2YCrCb);
 		
 		faceDetector.removeFaces(frame, frame);
 		skinDetector.drawRect(frame);
 		skinMask = skinDetector.detectSkin(frame);
-		contourImage = fingerCount.findHandContours(skinMask);
+		//contourImage = fingerCount.findHandContours(skinMask);
 		
 		/*
 		Mat histogram;
@@ -52,7 +60,7 @@ int main(int, char**) {
 
 		imshow("frame", frame);
 		imshow("skinMask", skinMask);
-		imshow("hand contour", contourImage);
+		//imshow("hand contour", contourImage);
 
 		int key = waitKey(1);
 
