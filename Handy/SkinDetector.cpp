@@ -66,14 +66,12 @@ Mat SkinDetector::detectSkin(Mat input) {
 	Mat skin;
 	inRange(input, Scalar(Y_MIN, Cr_MIN, Cb_MIN), Scalar(Y_MAX, Cr_MAX, Cb_MAX), skin);
 
-	/*
 	Mat kernel = getStructuringElement(MORPH_ELLIPSE, { 11, 11 });
-	erode(skin, skin, kernel, Point(-1,-1), 1);
+	//erode(skin, skin, kernel, Point(-1,-1), 1);
 	dilate(skin, skin, kernel, Point(-1, -1), 1);
 
-	GaussianBlur(skin, skin, { 3, 3 }, 0);
-	bitwise_and(skin, skin, skin);
-	*/
+	//GaussianBlur(skin, skin, { 3, 3 }, 0);
+	//bitwise_and(skin, skin, skin);
 
 	return skin;
 }
