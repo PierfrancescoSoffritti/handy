@@ -18,8 +18,9 @@ Rect sampleRect1, sampleRect2;
 void SkinDetector::drawSampleRects(Mat input) {
 	int width = input.size().width, height = input.size().height;
 
-	sampleRect1 = Rect(width / 5, height / 2, 20, 20);
-	sampleRect2 = Rect(width / 5, height / 3, 20, 20);
+	int rectSize = 20;
+	sampleRect1 = Rect(width / 5, height / 2, rectSize, rectSize);
+	sampleRect2 = Rect(width / 5, height / 3, rectSize, rectSize);
 
 	rectangle(
 		input,
