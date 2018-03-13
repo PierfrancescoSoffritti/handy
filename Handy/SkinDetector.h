@@ -8,16 +8,17 @@ using namespace std;
 class SkinDetector {
 	public:
 		SkinDetector(void);
+		bool calibrated;
 
-		void drawRect(Mat input);
+		void drawSampleRects(Mat input);
 		void calibrate(Mat input);
 		Mat detectSkin(Mat input);		
 
 	private:
-		int Y_MIN;
-		int Y_MAX;
-		int Cr_MIN;
-		int Cr_MAX;
-		int Cb_MIN;
-		int Cb_MAX;
+		int H_MIN;
+		int H_MAX;
+		int S_MIN;
+		int S_MAX;
+		int V_MIN;
+		int V_MAX;
 };

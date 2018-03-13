@@ -2,69 +2,70 @@
 #include"opencv2\opencv.hpp"
 
 SkinDetector::SkinDetector(void) {
-	//YCrCb threshold
-	Y_MIN = 0;
-	Y_MAX = 255;
-	Cr_MIN = 133;
-	Cr_MAX = 173;
-	Cb_MIN = 77;
-	Cb_MAX = 127;
+	//HSV threshold
+	H_MIN = 0;
+	H_MAX = 255;
+	S_MIN = 133;
+	S_MAX = 173;
+	V_MIN = 77;
+	V_MAX = 127;
+
+	calibrated = false;
 }
 
-Rect r1, r2;
+Rect sampleRect1, sampleRect2;
 
-void SkinDetector::drawRect(Mat input) {
-	int with = input.size().width, height = input.size().height;
+void SkinDetector::drawSampleRects(Mat input) {
+	int width = input.size().width, height = input.size().height;
 
-	r1 = Rect(with / 2, height / 2, 20, 20);
-	r2 = Rect(with / 2, height / 3, 20, 20);
+	sampleRect1 = Rect(width / 4, height / 2, 20, 20);
+	sampleRect2 = Rect(width / 4, height / 3, 20, 20);
 
 	rectangle(
 		input,
-		r1,
+		sampleRect1,
 		Scalar(255, 0, 255)
 	);
 
 	rectangle(
 		input,
-		r2,
+		sampleRect2,
 		Scalar(255, 0, 255)
 	);
 }
 
 void SkinDetector::calibrate(Mat input) {
 
-	//Mat skin;
-	//cvtColor(input, skin, COLOR_BGR2YCrCb);
+	Mat sample1 = Mat(input, sampleRect1);
+	Mat sample2 = Mat(input, sampleRect2);
 
-	Mat m1 = Mat(input, r1);
-	Mat m2 = Mat(input, r2);
+	vector<Mat> channelsSample1;
+	vector<Mat> channelsSample2;
 
-	vector<Mat> channels1;
-	vector<Mat> channels2;
-
-	split(m1, channels1);
-	split(m2, channels2);
+	split(sample1, channelsSample1);
+	split(sample2, channelsSample2);
 
 	int offsetMin = 60;
 	int offsetMax = 30;
 
-	Y_MIN = min( mean(channels1[0])[0], mean(channels2[0])[0]) - offsetMin;
-	Y_MAX = max( mean(channels1[0])[0], mean(channels2[0])[0]) + offsetMax;
+	H_MIN = min( mean(channelsSample1[0])[0], mean(channelsSample2[0])[0]) - offsetMin;
+	H_MAX = max( mean(channelsSample1[0])[0], mean(channelsSample2[0])[0]) + offsetMax;
 
-	Cr_MIN = min( mean(channels1[1])[0], mean(channels2[1])[0]) - offsetMin;
-	Cr_MAX = max( mean(channels1[1])[0], mean(channels2[1])[0]) + offsetMax;
+	S_MIN = min( mean(channelsSample1[1])[0], mean(channelsSample2[1])[0]) - offsetMin;
+	S_MAX = max( mean(channelsSample1[1])[0], mean(channelsSample2[1])[0]) + offsetMax;
 
-	Cb_MIN = min( mean(channels1[2])[0], mean(channels2[2])[0]) - offsetMin;
-	Cb_MAX = max( mean(channels1[2])[0], mean(channels2[2])[0]) + offsetMax;
+	V_MIN = min( mean(channelsSample1[2])[0], mean(channelsSample2[2])[0]) - offsetMin;
+	V_MAX = max( mean(channelsSample1[2])[0], mean(channelsSample2[2])[0]) + offsetMax;
+
+	calibrated = true;
 }
 
 Mat SkinDetector::detectSkin(Mat input) {
-	if (Y_MIN == 0)
+	if (!calibrated)
 		return input;
 
 	Mat skin;
-	inRange(input, Scalar(Y_MIN, Cr_MIN, Cb_MIN), Scalar(Y_MAX, Cr_MAX, Cb_MAX), skin);
+	inRange(input, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), skin);
 
 	Mat kernel = getStructuringElement(MORPH_ELLIPSE, { 11, 11 });
 	//erode(skin, skin, kernel, Point(-1,-1), 1);

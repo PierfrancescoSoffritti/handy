@@ -41,7 +41,7 @@ int main(int, char**) {
 		dilate(frame, frame, kernel, Point(-1, -1), 2);
 		
 		faceDetector.removeFaces(frame, frame);
-		skinDetector.drawRect(frame);
+		skinDetector.drawSampleRects(frame);
 		skinMask = skinDetector.detectSkin(frame);
 		contourImage = fingerCount.findHandContours(skinMask);
 		
