@@ -68,7 +68,7 @@ Mat SkinDetector::getSkinMask(Mat input) {
 	Mat skinMask;
 
 	if (!calibrated) {
-		skinMask = Mat::zeros(Size(input.cols, input.rows), CV_8UC1);
+		skinMask = Mat::zeros(input.size(), CV_8UC1);
 		return skinMask;
 	}
 

@@ -18,7 +18,8 @@ Mat getBackProjection(Mat in, Mat histogram);
 
 int main(int, char**) {
 	VideoCapture videoCapture(0);
-	
+	videoCapture.set(CV_CAP_PROP_SETTINGS, 1);
+
 	if (!videoCapture.isOpened()) {
 		cout << "Can't find camera!" << endl;
 		return -1;

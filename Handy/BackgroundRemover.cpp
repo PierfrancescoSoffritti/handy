@@ -16,18 +16,20 @@ Mat BackgroundRemover::getForegroundMask(Mat input) {
 	Mat mask;
 
 	if (!calibrated) {
-		mask = Mat::zeros(Size(input.cols, input.rows), CV_8UC1);
+		mask = Mat::zeros(input.size(), CV_8UC1);
 		return mask;
 	}
 
 	cvtColor(input, mask, CV_BGR2GRAY);
+
+	int offset = 10;
 
 	for (int i = 0; i < mask.rows; i++) {
 		for (int j = 0; j < mask.cols; j++) {
 			uchar framePixel = mask.at<uchar>(i, j);
 			uchar bgPixel = background.at<uchar>(i, j);
 
-			if (framePixel > bgPixel - 10 && framePixel < bgPixel + 10)
+			if (framePixel > bgPixel - offset && framePixel < bgPixel + offset)
 				mask.at<uchar>(i, j) = 0;
 			else
 				mask.at<uchar>(i, j) = 255;
