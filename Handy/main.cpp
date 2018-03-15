@@ -5,6 +5,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/video.hpp>
 
+#include "BackgroundRemover.h"
 #include "SkinDetector.h"
 #include "FaceDetector.h"
 #include "FingerCount.h"
@@ -24,9 +25,10 @@ int main(int, char**) {
 	}
 
 	Mat frame;
-	Mat skinMask;
+	Mat foregroundMask;
 	Mat contourImage;
 
+	BackgroundRemover backgroundRemover;
 	SkinDetector skinDetector;
 	FaceDetector faceDetector;
 	FingerCount fingerCount;
@@ -34,15 +36,18 @@ int main(int, char**) {
 	while (true) {
 		videoCapture >> frame;
 
-		cvtColor(frame, frame, CV_BGR2HSV);
+		Mat skinMask = backgroundRemover.getForegroundMask(frame);
+
+		Mat hsvFrame;
+		cvtColor(frame, hsvFrame, CV_BGR2HSV);
 
 		Mat kernel = getStructuringElement(MORPH_ELLIPSE, { 4, 4 });
-		erode(frame, frame, kernel, Point(-1, -1), 3);
-		dilate(frame, frame, kernel, Point(-1, -1), 2);
+		erode(hsvFrame, hsvFrame, kernel, Point(-1, -1), 3);
+		dilate(hsvFrame, hsvFrame, kernel, Point(-1, -1), 2);
 		
-		faceDetector.removeFaces(frame, frame);
-		skinDetector.drawSampleRects(frame);
-		skinMask = skinDetector.detectSkin(frame);
+		faceDetector.removeFaces(hsvFrame, hsvFrame);
+		skinDetector.drawSampleRects(hsvFrame);
+		skinMask = skinDetector.detectSkin(hsvFrame);
 		contourImage = fingerCount.findHandContours(skinMask);
 		
 		/*
@@ -53,7 +58,7 @@ int main(int, char**) {
 		frame = getBackProjection(frame, skinHistogram);	
 		*/
 
-		imshow("frame", frame);
+		imshow("hsvFrame", hsvFrame);
 		imshow("skinMask", skinMask);
 		imshow("hand contour", contourImage);
 
@@ -61,8 +66,10 @@ int main(int, char**) {
 
 		if (key == 27)
 			break;
-		else if(key > 0)
-			skinDetector.calibrate(frame);
+		else if (key > 0) {
+			skinDetector.calibrate(hsvFrame);
+			backgroundRemover.calibrate(frame);
+		}
 	}
 
 	return 0;
