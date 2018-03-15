@@ -25,7 +25,6 @@ int main(int, char**) {
 	}
 
 	Mat frame;
-	Mat foregroundMask;
 	Mat contourImage;
 
 	BackgroundRemover backgroundRemover;
@@ -36,40 +35,37 @@ int main(int, char**) {
 	while (true) {
 		videoCapture >> frame;
 
-		Mat skinMask = backgroundRemover.getForegroundMask(frame);
+		skinDetector.drawSampleRects(frame);
 
-		Mat hsvFrame;
-		cvtColor(frame, hsvFrame, CV_BGR2HSV);
+		Mat foregroundMask = backgroundRemover.getForegroundMask(frame);
 
-		Mat kernel = getStructuringElement(MORPH_ELLIPSE, { 4, 4 });
-		erode(hsvFrame, hsvFrame, kernel, Point(-1, -1), 3);
-		dilate(hsvFrame, hsvFrame, kernel, Point(-1, -1), 2);
+		Mat foreground;
+		frame.copyTo(foreground, foregroundMask);
 		
-		faceDetector.removeFaces(hsvFrame, hsvFrame);
-		skinDetector.drawSampleRects(hsvFrame);
-		skinMask = skinDetector.detectSkin(hsvFrame);
-		contourImage = fingerCount.findHandContours(skinMask);
-		
-		/*
-		Mat histogram;
-		histogram = getHistogram(frame, histogram, 25);
+		faceDetector.removeFaces(frame, foreground);
+		Mat handMask = skinDetector.getSkinMask(foreground);
+		//contourImage = fingerCount.findHandContours(handMask);
 
-		Mat skinHistogram = faceDetector.getSkinHistogram(frame);
-		frame = getBackProjection(frame, skinHistogram);	
-		*/
-
-		imshow("hsvFrame", hsvFrame);
-		imshow("skinMask", skinMask);
-		imshow("hand contour", contourImage);
+		imshow("hsvFrame", frame);
+		imshow("foregroundMask", foregroundMask);
+		imshow("handMask", handMask);
+		//imshow("hand contour", contourImage);
 
 		int key = waitKey(1);
 
-		if (key == 27)
+		if (key == 27) // esc
 			break;
-		else if (key > 0) {
-			skinDetector.calibrate(hsvFrame);
+		else if (key == 98) // b
 			backgroundRemover.calibrate(frame);
-		}
+		else if (key == 115) // s
+			skinDetector.calibrate(frame);
+
+		/*
+		Mat histogram;
+		histogram = getHistogram(frame, histogram, 25);
+		Mat skinHistogram = faceDetector.getSkinHistogram(frame);
+		frame = getBackProjection(frame, skinHistogram);
+		*/
 	}
 
 	return 0;

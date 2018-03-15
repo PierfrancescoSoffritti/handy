@@ -36,9 +36,12 @@ void SkinDetector::drawSampleRects(Mat input) {
 }
 
 void SkinDetector::calibrate(Mat input) {
+	
+	Mat hsvInput;
+	cvtColor(input, hsvInput, CV_BGR2HSV);
 
-	Mat sample1 = Mat(input, sampleRect1);
-	Mat sample2 = Mat(input, sampleRect2);
+	Mat sample1 = Mat(hsvInput, sampleRect1);
+	Mat sample2 = Mat(hsvInput, sampleRect2);
 
 	vector<Mat> channelsSample1;
 	vector<Mat> channelsSample2;
@@ -61,12 +64,18 @@ void SkinDetector::calibrate(Mat input) {
 	calibrated = true;
 }
 
-Mat SkinDetector::detectSkin(Mat input) {
-	if (!calibrated)
-		return input;
+Mat SkinDetector::getSkinMask(Mat input) {
+	Mat skinMask;
 
-	Mat skin;
-	inRange(input, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), skin);
+	if (!calibrated) {
+		skinMask = Mat::zeros(Size(input.cols, input.rows), CV_8UC1);
+		return skinMask;
+	}
+
+	Mat hsvInput;
+	cvtColor(input, hsvInput, CV_BGR2HSV);
+
+	inRange(hsvInput, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), skinMask);
 
 	/*
 	Mat kernel = getStructuringElement(MORPH_ELLIPSE, { 11, 11 });
@@ -77,5 +86,5 @@ Mat SkinDetector::detectSkin(Mat input) {
 	//bitwise_and(skin, skin, skin);
 	*/
 
-	return skin;
+	return skinMask;
 }

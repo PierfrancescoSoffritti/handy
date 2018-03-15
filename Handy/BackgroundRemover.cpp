@@ -29,10 +29,12 @@ Mat BackgroundRemover::getForegroundMask(Mat input) {
 
 			if (framePixel > bgPixel - 10 && framePixel < bgPixel + 10)
 				mask.at<uchar>(i, j) = 0;
+			else
+				mask.at<uchar>(i, j) = 255;
 		}
 	}
 
-	imshow("mask", mask);
+	//imshow("mask", mask);
 	
 	return mask;
 }

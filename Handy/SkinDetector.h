@@ -12,7 +12,7 @@ class SkinDetector {
 
 		void drawSampleRects(Mat input);
 		void calibrate(Mat input);
-		Mat detectSkin(Mat input);		
+		Mat getSkinMask(Mat input);
 
 	private:
 		int H_MIN;
