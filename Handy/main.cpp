@@ -27,6 +27,9 @@ int main(int, char**) {
 
 	Mat frame;
 	Mat contourImage;
+	Mat handMask;
+	Mat foreground;
+	Mat foregroundMask;
 
 	BackgroundRemover backgroundRemover;
 	SkinDetector skinDetector;
@@ -38,19 +41,18 @@ int main(int, char**) {
 
 		skinDetector.drawSampleRects(frame);
 
-		Mat foregroundMask = backgroundRemover.getForegroundMask(frame);
+		foregroundMask = backgroundRemover.getForegroundMask(frame);
 
-		Mat foreground;
 		frame.copyTo(foreground, foregroundMask);
 		
 		faceDetector.removeFaces(frame, foreground);
-		Mat handMask = skinDetector.getSkinMask(foreground);
-		//contourImage = fingerCount.findHandContours(handMask);
+		handMask = skinDetector.getSkinMask(foreground);
+		contourImage = fingerCount.findHandContours(handMask);
 
 		imshow("hsvFrame", frame);
 		imshow("foregroundMask", foregroundMask);
 		imshow("handMask", handMask);
-		//imshow("hand contour", contourImage);
+		imshow("contourImage", contourImage);
 
 		int key = waitKey(1);
 
