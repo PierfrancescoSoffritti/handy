@@ -28,7 +28,6 @@ int main(int, char**) {
 	Mat frame;
 	Mat contourImage;
 	Mat handMask;
-	Mat foreground;
 	Mat foregroundMask;
 
 	BackgroundRemover backgroundRemover;
@@ -43,6 +42,7 @@ int main(int, char**) {
 
 		foregroundMask = backgroundRemover.getForegroundMask(frame);
 
+		Mat foreground;
 		frame.copyTo(foreground, foregroundMask);
 		
 		faceDetector.removeFaces(frame, foreground);
