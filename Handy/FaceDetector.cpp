@@ -1,9 +1,6 @@
 #include "FaceDetector.h"
 #include"opencv2\opencv.hpp"
 
-using namespace cv;
-using namespace std;
-
 Rect getFaceRect(Mat input);
 
 String face_cascade_name = "../res/haarcascade_frontalface_alt.xml";
