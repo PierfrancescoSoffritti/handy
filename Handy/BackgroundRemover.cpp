@@ -1,10 +1,9 @@
 #include "BackgroundRemover.h"
 #include"opencv2\opencv.hpp"
 
-Mat background;
-bool calibrated = false;
-
 BackgroundRemover::BackgroundRemover(void) {
+	background;
+	calibrated = false;
 }
 
 void BackgroundRemover::calibrate(Mat input) {
@@ -12,31 +11,42 @@ void BackgroundRemover::calibrate(Mat input) {
 	calibrated = true;
 }
 
+Mat BackgroundRemover::getForeground(Mat input) {
+	Mat foregroundMask = getForegroundMask(input);
+
+	imshow("foregroundMask", foregroundMask);
+
+	Mat foreground;
+	input.copyTo(foreground, foregroundMask);
+
+	return foreground;
+}
+
 Mat BackgroundRemover::getForegroundMask(Mat input) {
-	Mat mask;
+	Mat foregroundMask;
 
 	if (!calibrated) {
-		mask = Mat::zeros(input.size(), CV_8UC1);
-		return mask;
+		foregroundMask = Mat::zeros(input.size(), CV_8UC1);
+		return foregroundMask;
 	}
 
-	cvtColor(input, mask, CV_BGR2GRAY);
+	cvtColor(input, foregroundMask, CV_BGR2GRAY);
 
 	int offset = 10;
 
-	for (int i = 0; i < mask.rows; i++) {
-		for (int j = 0; j < mask.cols; j++) {
-			uchar framePixel = mask.at<uchar>(i, j);
+	for (int i = 0; i < foregroundMask.rows; i++) {
+		for (int j = 0; j < foregroundMask.cols; j++) {
+			uchar framePixel = foregroundMask.at<uchar>(i, j);
 			uchar bgPixel = background.at<uchar>(i, j);
 
 			if (framePixel > bgPixel - offset && framePixel < bgPixel + offset)
-				mask.at<uchar>(i, j) = 0;
+				foregroundMask.at<uchar>(i, j) = 0;
 			else
-				mask.at<uchar>(i, j) = 255;
+				foregroundMask.at<uchar>(i, j) = 255;
 		}
 	}
 
 	//imshow("mask", mask);
 	
-	return mask;
+	return foregroundMask;
 }
