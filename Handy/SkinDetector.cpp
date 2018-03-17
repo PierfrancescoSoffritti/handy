@@ -49,7 +49,9 @@ void SkinDetector::calibrate(Mat input) {
 	split(sample1, channelsSample1);
 	split(sample2, channelsSample2);
 
-	int offsetMin = 60;
+	//int offsetMin = 60;
+	//int offsetMax = 30;
+	int offsetMin = 80;
 	int offsetMax = 30;
 
 	H_MIN = min( mean(channelsSample1[0])[0], mean(channelsSample2[0])[0]) - offsetMin;
