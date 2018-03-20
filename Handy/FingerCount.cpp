@@ -4,8 +4,11 @@
 #include "opencv2/highgui.hpp"
 
 #define DEBUG false
-#define MAX_NEIGHBOR_DISTANCE 20
-#define LIMIT_ANGLE 40
+#define LIMIT_ANGLE_SUP 60
+#define LIMIT_ANGLE_INF 5
+#define BOUNDING_RECT_FINGER_SIZE_SCALING 0.35
+#define BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING 0.05
+#define LIMIT_MIN_DISTANCE_FROM_PALM 120
 
 using namespace cv;
 using namespace std;
@@ -28,7 +31,7 @@ cv::Mat FingerCount::findHandContours(cv::Mat input) {
 
 	// check if the source image is good
 	if (input.empty())
-		throw runtime_error("Could not open the input image!\n");
+		printf("Error findHandContours, could not open the input image!\n");
 
 	// image returned by this function
 	Mat contours_image = Mat::zeros(input.size(), CV_8UC3);
@@ -60,8 +63,8 @@ cv::Mat FingerCount::findHandContours(cv::Mat input) {
 	}
 
 	if (biggest_contour_index < 0)
-		throw runtime_error("Could not find the biggest contour!\n");
-
+		printf("Error findHandContours, could not find the biggest contour!\n");
+	
 	// find the convex hull object for each contour and the defects, two different data structure are needed by the OpenCV api
 	vector<Point> hull_points; // for drawing the convex hull
 	vector<int> hull_ints; // for finding the defects
@@ -91,45 +94,68 @@ cv::Mat FingerCount::findHandContours(cv::Mat input) {
 	circle(contours_image, center_bounding_rect, 5, color_blue, 2, 8);
 
 	// we separate the defects keeping only the ones of intrest
-	vector<Point> defect_points;
-		
+	vector<Point> defect_points;	
+	
 	for (int i = 0; i < defects.size(); i++) {
-		
-		// start points
-		defect_points.push_back(contours[biggest_contour_index][defects[i].val[0]]);
-			
-		// far points
-		defect_points.push_back(contours[biggest_contour_index][defects[i].val[2]]);
+		defect_points.push_back(contours[biggest_contour_index][defects[i].val[0]]); // start points
+		defect_points.push_back(contours[biggest_contour_index][defects[i].val[2]]); // far points
 	}
 
-	vector<Point> filtered_points = findNeighborhoodMedian(defect_points);
-		
-	//for (int i = 0; i < filtered_points.size(); i++) {
-	//	char str[200];
-	//	sprintf_s(str, "%d", i);
-	//	if ( i % 2 == 0)
-	//		circle(contours_image, filtered_points[i], 5, color_white, 2, 8);
-	//	else
-	//		circle(contours_image, filtered_points[i], 5, color_red, 2, 8);
-	//	putText(contours_image, str, filtered_points[i], FONT_HERSHEY_PLAIN, 2, color_white);
-	//}
+	vector<Point> filtered_defects_points = compactOnNeighborhoodMedian(defect_points, bounding_rectangle.height * BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING);
 	
-	vector<int> fingertip_point_index;
-	
-	// first point
-	if (findAngle(filtered_points[filtered_points.size() - 1], filtered_points[0], filtered_points[1]) < LIMIT_ANGLE)
-		fingertip_point_index.push_back(0);
+	vector<Point> extr_points;
+	vector<Point> depr_points;
 
-	// every other point
-	for (int i = 1; i < filtered_points.size() - 1; i++) {
-		if ((i % 2) == 0) {
-			if (findAngle(filtered_points[i - 1], filtered_points[i], filtered_points[i + 1]) < LIMIT_ANGLE)
-				fingertip_point_index.push_back(i);
+	for (Point p : filtered_defects_points) {
+		if (findPointsDistance(p, center_bounding_rect) > bounding_rectangle.height * BOUNDING_RECT_FINGER_SIZE_SCALING)
+			extr_points.push_back(p);
+		else
+			depr_points.push_back(p);
+	}
+
+	vector<Point> filtered_extr_points = compactOnNeighborhoodMedian(extr_points, bounding_rectangle.height * BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING * 2); // we apply a stronger filter
+	vector<Point> filtered_depr_points = compactOnNeighborhoodMedian(depr_points, bounding_rectangle.height * BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING);
+
+	vector<Point> all;
+	for (int i = 0; i < filtered_extr_points.size() && i < filtered_depr_points.size(); i++) {
+		all.push_back(filtered_extr_points[i]);
+		all.push_back(filtered_depr_points[i]);
+	}
+
+	// we draw all the points, now supposedly filtered and ordered
+	for (int i = 0; i < all.size(); i++) {
+		circle(contours_image, all[i], 5, color_red, 2, 8);
+		putText(contours_image, to_string(i), all[i], FONT_HERSHEY_PLAIN, 3, color_red);
+	}
+
+	if (all.size() > 3) {
+		vector<int> fingertip_point_index;
+
+		// first point
+		if (isFinger(all[all.size() - 1], all[0], all[1], LIMIT_ANGLE_INF, LIMIT_ANGLE_SUP, center_bounding_rect, bounding_rectangle.height * BOUNDING_RECT_FINGER_SIZE_SCALING))
+			fingertip_point_index.push_back(0);
+
+		// every other point
+		for (int i = 1; i < all.size() - 1 && fingertip_point_index.size() < 5; i++) {
+			if ((i % 2) == 0) {
+				if (isFinger(all[i - 1], all[i], all[i + 1], LIMIT_ANGLE_INF, LIMIT_ANGLE_SUP, center_bounding_rect, bounding_rectangle.height * BOUNDING_RECT_FINGER_SIZE_SCALING))
+					fingertip_point_index.push_back(i);
+			}
 		}
-	}
-	
-	for (int i : fingertip_point_index) {
-		circle(contours_image, filtered_points[i], 5, color_yellow, 2, 8);
+
+		// we draw the detected points
+		vector<Point> fingers;
+		for (int i : fingertip_point_index) {
+			fingers.push_back(all[i]);
+		}
+		
+		vector<Point> filtered_fingers = compactOnNeighborhoodMedian(fingers, bounding_rectangle.height * BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING * 3);
+		for (Point p : filtered_fingers) {
+			circle(contours_image, p, 5, color_yellow, 2, 8);
+		}
+
+		// we draw the number of finers found
+		putText(contours_image, to_string(fingers.size()), center_bounding_rect, FONT_HERSHEY_PLAIN, 3, color_white);
 	}
 
 	return contours_image;
@@ -140,18 +166,25 @@ double FingerCount::findPointsDistance(cv::Point a, cv::Point b) {
 	return sqrt(difference.ddot(difference));
 }
 
-std::vector<cv::Point> FingerCount::findNeighborhoodMedian(std::vector<cv::Point> points) {
-	if (points.size() == 0)
-		throw runtime_error("You have passed an empty evector!\n");
-
+std::vector<cv::Point> FingerCount::compactOnNeighborhoodMedian(std::vector<cv::Point> points, double max_neighbor_distance) {
 	vector<Point> median_points;
+	
+	if (points.size() == 0) {
+		printf("Error compactOnNeighborhoodMedian, points.size() zero.\n");
+		return median_points;
+	}
+
+	if (max_neighbor_distance <= 0) {
+		printf("Error compactOnNeighborhoodMedian, max_neighbor_distance less or equal zero.\n");
+		return median_points;
+	}
 
 	// we start with the first point
 	Point reference = points[0];
 	Point median = points[0];
 
 	for (int i = 1; i < points.size(); i++) {
-		if (findPointsDistance(reference, points[i]) > MAX_NEIGHBOR_DISTANCE) {
+		if (findPointsDistance(reference, points[i]) > max_neighbor_distance) {
 			
 			// the point is not in range, we save the median
 			median_points.push_back(median);
@@ -175,4 +208,24 @@ double FingerCount::findAngle(cv::Point a, cv::Point b, cv::Point c) {
 	double bc = findPointsDistance(b, c);
 	double ac = findPointsDistance(a, c);
 	return acos((ab * ab + bc * bc - ac * ac) / (2 * ab * bc)) * 180 / CV_PI;
+}
+
+bool FingerCount::isFinger(cv::Point a, cv::Point b, cv::Point c, double limit_angle_inf, double limit_angle_sup, Point palm_center, double min_distance_from_palm) {
+	if (min_distance_from_palm < LIMIT_MIN_DISTANCE_FROM_PALM)
+		return false;
+	
+	double angle = findAngle(a, b, c);
+	if (angle > limit_angle_sup || angle < limit_angle_inf)
+		return false;
+
+	int delta_y_1 = b.y - a.y;
+	int delta_y_2 = b.y - c.y;
+	if (delta_y_1 > 0 && delta_y_2 > 0)
+		return false;
+
+	double distance_from_palm = findPointsDistance(b, palm_center);
+	if (distance_from_palm < min_distance_from_palm)
+		return false;
+
+	return true;
 }
