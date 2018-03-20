@@ -2,36 +2,37 @@
 #include"opencv2\opencv.hpp"
 
 SkinDetector::SkinDetector(void) {
-	//HSV threshold
 	H_MIN = 0;
-	H_MAX = 255;
-	S_MIN = 133;
-	S_MAX = 173;
-	V_MIN = 77;
-	V_MAX = 127;
+	H_MAX = 0;
+	S_MIN = 0;
+	S_MAX = 0;
+	V_MIN = 0;
+	V_MAX = 0;
 
 	calibrated = false;
+
+	skinColorSamplerRectangle1, skinColorSamplerRectangle2;
 }
 
-Rect sampleRect1, sampleRect2;
+void SkinDetector::drawSkinColorSampler(Mat frame) {
+	int frameWidth = frame.size().width, frameHeight = frame.size().height;
 
-void SkinDetector::drawSampleRects(Mat input) {
-	int width = input.size().width, height = input.size().height;
+	int rectangleSize = 20;
+	Scalar rectangleColor = Scalar(255, 0, 255);
 
-	int rectSize = 20;
-	sampleRect1 = Rect(width / 5, height / 2, rectSize, rectSize);
-	sampleRect2 = Rect(width / 5, height / 3, rectSize, rectSize);
+	skinColorSamplerRectangle1 = Rect(frameWidth / 5, frameHeight / 2, rectangleSize, rectangleSize);
+	skinColorSamplerRectangle2 = Rect(frameWidth / 5, frameHeight / 3, rectangleSize, rectangleSize);
 
 	rectangle(
-		input,
-		sampleRect1,
-		Scalar(255, 0, 255)
+		frame,
+		skinColorSamplerRectangle1,
+		rectangleColor
 	);
 
 	rectangle(
-		input,
-		sampleRect2,
-		Scalar(255, 0, 255)
+		frame,
+		skinColorSamplerRectangle2,
+		rectangleColor
 	);
 }
 
@@ -40,8 +41,8 @@ void SkinDetector::calibrate(Mat input) {
 	Mat hsvInput;
 	cvtColor(input, hsvInput, CV_BGR2HSV);
 
-	Mat sample1 = Mat(hsvInput, sampleRect1);
-	Mat sample2 = Mat(hsvInput, sampleRect2);
+	Mat sample1 = Mat(hsvInput, skinColorSamplerRectangle1);
+	Mat sample2 = Mat(hsvInput, skinColorSamplerRectangle2);
 
 	vector<Mat> channelsSample1;
 	vector<Mat> channelsSample2;
@@ -49,7 +50,7 @@ void SkinDetector::calibrate(Mat input) {
 	split(sample1, channelsSample1);
 	split(sample2, channelsSample2);
 
-	int offsetMin = 60;
+	int offsetMin = 80;
 	int offsetMax = 30;
 
 	H_MIN = min( mean(channelsSample1[0])[0], mean(channelsSample2[0])[0]) - offsetMin;

@@ -1,13 +1,7 @@
 #include "FaceDetector.h"
 #include"opencv2\opencv.hpp"
 
-using namespace cv;
-using namespace std;
-
 Rect getFaceRect(Mat input);
-Mat getSkinInstogramFromFace(Mat input, int bins);
-void drawHistogram(Mat input, int bins);
-
 
 String face_cascade_name = "../res/haarcascade_frontalface_alt.xml";
 CascadeClassifier face_cascade;
@@ -24,7 +18,6 @@ void FaceDetector::removeFaces(Mat input, Mat output) {
 	cvtColor(input, frame_gray, CV_BGR2GRAY);
 	equalizeHist(frame_gray, frame_gray);
 
-	//-- Detect faces
 	face_cascade.detectMultiScale(frame_gray, faces, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(120, 120));
 
 	for (size_t i = 0; i < faces.size(); i++) {
@@ -36,25 +29,6 @@ void FaceDetector::removeFaces(Mat input, Mat output) {
 			-1
 		);
 	}
-}
-
-Mat FaceDetector::getSkinHistogram(Mat input) {
-	Rect faceRect = getFaceRect(input);
-
-	Mat face = Mat(input, faceRect);
-	imshow("face", face);
-
-	Mat skinHistogram = getSkinInstogramFromFace(face, 25);
-
-	rectangle(
-		input,
-		Point(faceRect.x, faceRect.y),
-		Point(faceRect.x + faceRect.width, faceRect.y + faceRect.height),
-		Scalar(0, 0, 0),
-		-1
-	);
-
-	return skinHistogram;
 }
 
 Rect getFaceRect(Mat input) {
@@ -70,40 +44,4 @@ Rect getFaceRect(Mat input) {
 		return faceRectangles[0];
 	else
 		return Rect(0, 0, 1, 1);
-}
-
-Mat getSkinInstogramFromFace(Mat input, int bins) {
-	
-	int numImages = 1;
-	int channels[] = { 0 };
-	Mat mask = Mat();
-	int dims = 1;
-
-	float range[] = { 120, 200 };
-	const float* ranges[] = { range };
-
-	Mat histogram;
-	calcHist(&input, numImages, channels, mask, histogram, dims, &bins, ranges);
-	normalize(histogram, histogram, 0, 255, NORM_MINMAX, -1, Mat());
-
-	drawHistogram(histogram, bins);
-
-	return histogram;
-}
-
-void drawHistogram(Mat histogram, int bins) {
-	int width = 400, height = 400;
-	int bin_width = cvRound( width / bins);
-	Mat histogramImage = Mat::zeros(width, height, CV_8UC3);
-
-	for (int i = 0; i < bins; i++)
-		rectangle(
-			histogramImage,
-			Point(i*bin_width, height),
-			Point( (i + 1) * bin_width, height - cvRound( histogram.at<float>(i)*height / 255.0 ) ),
-			Scalar(0, 0, 255),
-			-1
-		);
-
-	imshow("faceHistogramImage", histogramImage);
 }

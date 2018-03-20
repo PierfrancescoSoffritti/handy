@@ -2,10 +2,11 @@
 
 #include<opencv\cv.h>
 
-class FaceDetector {
-public:
-	FaceDetector(void);
+using namespace cv;
+using namespace std;
 
-	void removeFaces(cv::Mat input, cv::Mat output);
-	cv::Mat getSkinHistogram(cv::Mat input);
+class FaceDetector {
+	public:
+		FaceDetector(void);
+		void removeFaces(Mat input, Mat output);
 };
