@@ -4,7 +4,7 @@
 class FingerCount {
 public:
 	FingerCount(void);
-	cv::Mat findHandContours(cv::Mat input);
+	cv::Mat findFingersCount(cv::Mat input);
 	double FingerCount::findPointsDistance(cv::Point a, cv::Point b);
 	std::vector<cv::Point> FingerCount::compactOnNeighborhoodMedian(std::vector<cv::Point> points, double max_neighbor_distance);
 	double FingerCount::findAngle(cv::Point a, cv::Point b, cv::Point c);

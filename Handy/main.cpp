@@ -38,7 +38,7 @@ int main(int, char**) {
 		
 		faceDetector.removeFaces(frame, foreground);
 		handMask = skinDetector.getSkinMask(foreground);
-		handContourImage = fingerCount.findHandContours(handMask);
+		handContourImage = fingerCount.findFingersCount(handMask);
 
 		imshow("hsvFrame", frame);
 		imshow("handMask", handMask);

@@ -3,7 +3,6 @@
 #include "opencv2/imgproc.hpp"
 #include "opencv2/highgui.hpp"
 
-#define DEBUG false
 #define LIMIT_ANGLE_SUP 60
 #define LIMIT_ANGLE_INF 5
 #define BOUNDING_RECT_FINGER_SIZE_SCALING 0.35
@@ -15,7 +14,7 @@ using namespace std;
 
 FingerCount::FingerCount(void) {}
 
-cv::Mat FingerCount::findHandContours(cv::Mat input) {
+cv::Mat FingerCount::findFingersCount(cv::Mat input) {
 	
 	// colors
 	Scalar color_blue(255, 0, 0);
@@ -23,11 +22,6 @@ cv::Mat FingerCount::findHandContours(cv::Mat input) {
 	Scalar color_red(0, 0, 255);
 	Scalar color_white(255, 255, 255);
 	Scalar color_yellow(0, 255, 255);
-
-	if (DEBUG) {
-		input = imread("../res/handy.png", CV_LOAD_IMAGE_COLOR); 
-		cvtColor(input, input, CV_BGR2GRAY);
-	}
 
 	// check if the source image is good
 	if (input.empty())
@@ -61,10 +55,10 @@ cv::Mat FingerCount::findHandContours(cv::Mat input) {
 			biggest_contour_index = i;
 		}
 	}
-
-	if (biggest_contour_index < 0)
-		printf("Error findHandContours, could not find the biggest contour!\n");
 	
+	if (biggest_contour_index < 0)
+		printf("Could not find biggest contour!\n");
+
 	// find the convex hull object for each contour and the defects, two different data structure are needed by the OpenCV api
 	vector<Point> hull_points; // for drawing the convex hull
 	vector<int> hull_ints; // for finding the defects
@@ -95,13 +89,13 @@ cv::Mat FingerCount::findHandContours(cv::Mat input) {
 
 	// we separate the defects keeping only the ones of intrest
 	vector<Point> defect_points;	
-	
+
 	for (int i = 0; i < defects.size(); i++) {
 		defect_points.push_back(contours[biggest_contour_index][defects[i].val[0]]); // start points
 		defect_points.push_back(contours[biggest_contour_index][defects[i].val[2]]); // far points
 	}
 
-	vector<Point> filtered_defects_points = compactOnNeighborhoodMedian(defect_points, bounding_rectangle.height * BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING);
+	vector<Point> filtered_defects_points = compactOnNeighborhoodMedian(defect_points, bounding_rectangle.height * BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING * 2);
 	
 	vector<Point> extr_points;
 	vector<Point> depr_points;
@@ -113,13 +107,13 @@ cv::Mat FingerCount::findHandContours(cv::Mat input) {
 			depr_points.push_back(p);
 	}
 
-	vector<Point> filtered_extr_points = compactOnNeighborhoodMedian(extr_points, bounding_rectangle.height * BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING * 2); // we apply a stronger filter
-	vector<Point> filtered_depr_points = compactOnNeighborhoodMedian(depr_points, bounding_rectangle.height * BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING);
+	//vector<Point> filtered_extr_points = compactOnNeighborhoodMedian(extr_points, bounding_rectangle.height * BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING * 2); // we apply a stronger filter
+	//vector<Point> filtered_depr_points = compactOnNeighborhoodMedian(depr_points, bounding_rectangle.height * BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING);
 
 	vector<Point> all;
-	for (int i = 0; i < filtered_extr_points.size() && i < filtered_depr_points.size(); i++) {
-		all.push_back(filtered_extr_points[i]);
-		all.push_back(filtered_depr_points[i]);
+	for (int i = 0; i < extr_points.size() && i < depr_points.size(); i++) {
+		all.push_back(extr_points[i]);
+		all.push_back(depr_points[i]);
 	}
 
 	// we draw all the points, now supposedly filtered and ordered
@@ -148,9 +142,21 @@ cv::Mat FingerCount::findHandContours(cv::Mat input) {
 		for (int i : fingertip_point_index) {
 			fingers.push_back(all[i]);
 		}
+
+		if (fingers.size() > 2) {
+
+			if (findPointsDistance(fingers[0], fingers[1]) < bounding_rectangle.height * BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING * 2)
+				fingers.erase(fingers.begin() + 1);
+
+		/*	for (int i = 1; i < fingers.size(); i++)
+				if (findPointsDistance(fingers[i], fingers[i - 1]) < bounding_rectangle.height * BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING * 2) 
+					fingers.erase(fingers.begin() + i);*/
 		
-		vector<Point> filtered_fingers = compactOnNeighborhoodMedian(fingers, bounding_rectangle.height * BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING * 3);
-		for (Point p : filtered_fingers) {
+			if (findPointsDistance(fingers[0], fingers[fingers.size() - 1]) < bounding_rectangle.height * BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING * 2)
+				fingers.erase(fingers.begin() + fingers.size() - 1);
+		}
+
+		for (Point p : fingers) {
 			circle(contours_image, p, 5, color_yellow, 2, 8);
 		}
 
