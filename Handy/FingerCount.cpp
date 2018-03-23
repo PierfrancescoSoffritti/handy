@@ -5,9 +5,8 @@
 
 #define LIMIT_ANGLE_SUP 60
 #define LIMIT_ANGLE_INF 5
-#define BOUNDING_RECT_FINGER_SIZE_SCALING 0.35
+#define BOUNDING_RECT_FINGER_SIZE_SCALING 0.3
 #define BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING 0.1
-#define LIMIT_MIN_DISTANCE_FROM_PALM 120
 
 using namespace cv;
 using namespace std;
@@ -85,7 +84,7 @@ cv::Mat FingerCount::findFingersCount(cv::Mat input) {
 		(bounding_rectangle.tl().x + bounding_rectangle.br().x) / 2,
 		(bounding_rectangle.tl().y + bounding_rectangle.br().y) / 2
 	);
-	circle(contours_image, center_bounding_rect, 5, color_blue, 2, 8);
+	circle(contours_image, center_bounding_rect, 5, color_white, 2, 8);
 
 	// we separate the defects keeping only the ones of intrest
 	vector<Point> defect_points;
@@ -197,9 +196,6 @@ double FingerCount::findAngle(cv::Point a, cv::Point b, cv::Point c) {
 }
 
 bool FingerCount::isFinger(cv::Point a, cv::Point b, cv::Point c, double limit_angle_inf, double limit_angle_sup, Point palm_center, double min_distance_from_palm) {
-	if (min_distance_from_palm < LIMIT_MIN_DISTANCE_FROM_PALM)
-		return false;
-	
 	double angle = findAngle(a, b, c);
 	if (angle > limit_angle_sup || angle < limit_angle_inf)
 		return false;
