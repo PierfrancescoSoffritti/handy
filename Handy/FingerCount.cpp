@@ -3,10 +3,10 @@
 #include "opencv2/imgproc.hpp"
 #include "opencv2/highgui.hpp"
 
-#define LIMIT_ANGLE_SUP 50
-#define LIMIT_ANGLE_INF 10
+#define LIMIT_ANGLE_SUP 60
+#define LIMIT_ANGLE_INF 5
 #define BOUNDING_RECT_FINGER_SIZE_SCALING 0.3
-#define BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING 0.1
+#define BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING 0.05
 
 using namespace cv;
 using namespace std;
@@ -91,9 +91,9 @@ cv::Mat FingerCount::findFingersCount(cv::Mat input) {
 	vector<Point> far_points;
 
 	for (int i = 0; i < defects.size(); i++) {
-		start_points.push_back(contours[biggest_contour_index][defects[i].val[0]]); // start points
+		start_points.push_back(contours[biggest_contour_index][defects[i].val[0]]);
 		if (findPointsDistance(contours[biggest_contour_index][defects[i].val[2]], center_bounding_rect) < bounding_rectangle.height * BOUNDING_RECT_FINGER_SIZE_SCALING)
-			far_points.push_back(contours[biggest_contour_index][defects[i].val[2]]); // far points
+			far_points.push_back(contours[biggest_contour_index][defects[i].val[2]]);
 	}
 
 	// we compact them on their medians
@@ -112,36 +112,42 @@ cv::Mat FingerCount::findFingersCount(cv::Mat input) {
 
 	// now we try to find the fingers
 	if (filtered_far_points.size() > 2) {
-		vector<int> fingertip_index;
+		vector<Point> finger_points;
 
 		for (int i = 0; i < filtered_start_points.size(); i++) {
 			vector<Point> close = findClosestOnX(filtered_far_points, filtered_start_points[i]);
 
 			if (close.size() == 2) {
 				if (isFinger(close[0], filtered_start_points[i], close[1], LIMIT_ANGLE_INF, LIMIT_ANGLE_SUP, center_bounding_rect, bounding_rectangle.height * BOUNDING_RECT_FINGER_SIZE_SCALING))
-					fingertip_index.push_back(i);
+					finger_points.push_back(filtered_start_points[i]);
 			}
 		}
 
 		// we have at most five fingers usually :)
-		while (fingertip_index.size() > 5)
-			fingertip_index.pop_back();
+		while (finger_points.size() > 5)
+			finger_points.pop_back();
+	
+		if (finger_points.size() > 0) {
 
-		//if (fingertip_index.size() > 1) {
-		//	if (findPointsDistanceOnX(filtered_start_points[fingertip_index[0]], filtered_start_points[fingertip_index[fingertip_index.size() - 1]]) < bounding_rectangle.height * BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING * 2)		
-		//		fingertip_index.pop_back();
-		//	
-		//	for (int i = 1; i < fingertip_index.size() - 1; i++) {
-		//		if (findPointsDistanceOnX(filtered_start_points[fingertip_index[i]], filtered_start_points[fingertip_index[i + 1]]) < bounding_rectangle.height * BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING * 10)	
-		//			fingertip_index.erase(fingertip_index.begin() + i);
-		//	}
-		//}
+			vector<Point> filtered_finger_points;
+			for (int i = 0; i < finger_points.size() - 1; i++) {
+				if (findPointsDistanceOnX(finger_points[i], finger_points[i + 1]) > bounding_rectangle.height * BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING * 1.5)
+					filtered_finger_points.push_back(finger_points[i]);
+			}
 
-		// we draw the fingers found
-		for (int i : fingertip_index)
-			circle(contours_image, filtered_start_points[i], 5, color_yellow, 2, 8);
+			if (finger_points.size() > 2) {
+				if (findPointsDistanceOnX(finger_points[0], finger_points[finger_points.size() - 1]) > bounding_rectangle.height * BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING * 1.5)
+					filtered_finger_points.push_back(finger_points[finger_points.size() - 1]);
+			}
+			else {
+				filtered_finger_points.push_back(finger_points[finger_points.size() - 1]);
+			}
 
-		putText(contours_image, to_string(fingertip_index.size()), center_bounding_rect, FONT_HERSHEY_PLAIN, 3, color_yellow);
+			for (Point p : filtered_finger_points)
+				circle(contours_image, p, 5, color_yellow, 2, 8);
+			
+			putText(contours_image, to_string(filtered_finger_points.size()), center_bounding_rect, FONT_HERSHEY_PLAIN, 3, color_yellow);
+		}
 	}
 
 	return contours_image;
@@ -200,6 +206,11 @@ bool FingerCount::isFinger(cv::Point a, cv::Point b, cv::Point c, double limit_a
 	int delta_y_1 = b.y - a.y;
 	int delta_y_2 = b.y - c.y;
 	if (delta_y_1 > 0 && delta_y_2 > 0)
+		return false;
+
+	int delta_y_3 = palm_center.y - a.y;
+	int delta_y_4 = palm_center.y - c.y;
+	if (delta_y_3 < 0 && delta_y_4 < 0)
 		return false;
 
 	double distance_from_palm = findPointsDistance(b, palm_center);
