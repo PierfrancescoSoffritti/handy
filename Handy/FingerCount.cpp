@@ -217,6 +217,12 @@ bool FingerCount::isFinger(Point a, Point b, Point c, double limit_angle_inf, do
 	double distance_from_palm = findPointsDistance(b, palm_center);
 	if (distance_from_palm < min_distance_from_palm)
 		return false;
+	
+	// this should be the case when no fingers are up
+	double distance_from_palm_far_1 = findPointsDistance(a, palm_center);
+	double distance_from_palm_far_2 = findPointsDistance(c, palm_center);
+	if (distance_from_palm_far_1 < min_distance_from_palm / 4 || distance_from_palm_far_2 < min_distance_from_palm / 4)
+		return false;
 
 	return true;
 }
