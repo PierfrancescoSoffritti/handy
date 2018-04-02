@@ -14,7 +14,7 @@ void BackgroundRemover::calibrate(Mat input) {
 Mat BackgroundRemover::getForeground(Mat input) {
 	Mat foregroundMask = getForegroundMask(input);
 
-	imshow("foregroundMask", foregroundMask);
+	//imshow("foregroundMask", foregroundMask);
 
 	Mat foreground;
 	input.copyTo(foreground, foregroundMask);

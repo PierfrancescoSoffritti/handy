@@ -29,8 +29,6 @@ int main(int, char**) {
 	FaceDetector faceDetector;
 	FingerCount fingerCount;
 
-	size_t finger_number;
-
 	while (true) {
 		videoCapture >> frame;
 
@@ -40,10 +38,12 @@ int main(int, char**) {
 		
 		faceDetector.removeFaces(frame, foreground);
 		handMask = skinDetector.getSkinMask(foreground);
-		finger_number = fingerCount.findFingersCount(handMask, true);
-		cout << "Fingers found: " << finger_number << endl;
+		fingerCount.findFingersCount(handMask, true);
 
-		imshow("hsvFrame", frame);
+		imshow("output", frame);
+		imshow("foreground", foreground);
+		imshow("handMask", handMask);
+		imshow("fingerCountDebug", handMask);
 		
 		int key = waitKey(1);
 
