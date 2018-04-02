@@ -8,7 +8,7 @@ using namespace std;
 class FingerCount {
 	public:
 		FingerCount(void);
-		size_t findFingersCount(Mat input_image, bool show_img);
+		Mat findFingersCount(Mat input_image, Mat frame);
 	
 	private:
 		Scalar color_blue;

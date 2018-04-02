@@ -18,16 +18,16 @@ FingerCount::FingerCount(void) {
 	color_purple = Scalar(255, 0, 255);
 }
 
-size_t FingerCount::findFingersCount(Mat input_image, bool show_img) {
-	size_t fingers_found = 0;
+Mat FingerCount::findFingersCount(Mat input_image, Mat frame) {
+	Mat contours_image = Mat::zeros(input_image.size(), CV_8UC3);
 
 	// check if the source image is good
 	if (input_image.empty())
-		return fingers_found;
+		return contours_image;
 
 	// we work only on the 1 channel result, since this function is called inside a loop we are not sure that this is always the case
 	if (input_image.channels() != 1)
-		return fingers_found;
+		return contours_image;
 
 	vector<vector<Point>> contours;
 	vector<Vec4i> hierarchy;
@@ -36,7 +36,7 @@ size_t FingerCount::findFingersCount(Mat input_image, bool show_img) {
 
 	// we need at least one contour to work
 	if (contours.size() <= 0)
-		return fingers_found;
+		return contours_image;
 
 	// find the biggest contour (let's suppose it's our hand)
 	int biggest_contour_index = -1;
@@ -51,7 +51,7 @@ size_t FingerCount::findFingersCount(Mat input_image, bool show_img) {
 	}
 
 	if (biggest_contour_index < 0)
-		return fingers_found;
+		return contours_image;
 
 	// find the convex hull object for each contour and the defects, two different data structure are needed by the OpenCV api
 	vector<Point> hull_points;
@@ -68,7 +68,7 @@ size_t FingerCount::findFingersCount(Mat input_image, bool show_img) {
 	if (hull_ints.size() > 3)
 		convexityDefects(Mat(contours[biggest_contour_index]), hull_ints, defects);
 	else
-		return fingers_found;
+		return contours_image;
 
 	// we bound the convex hull
 	Rect bounding_rectangle = boundingRect(Mat(hull_points));
@@ -126,30 +126,26 @@ size_t FingerCount::findFingersCount(Mat input_image, bool show_img) {
 			}
 			else
 				filtered_finger_points.push_back(finger_points[finger_points.size() - 1]);
-
-			fingers_found = filtered_finger_points.size();
 		}
 	}
+	
+	// we draw what found on the returned image 
+	drawContours(contours_image, contours, biggest_contour_index, color_green, 2, 8, hierarchy);
+	polylines(contours_image, hull_points, true, color_blue);
+	rectangle(contours_image, bounding_rectangle.tl(), bounding_rectangle.br(), color_red, 2, 8, 0);
+	circle(contours_image, center_bounding_rect, 5, color_purple, 2, 8);
+	drawVectorPoints(contours_image, filtered_start_points, color_blue, true);
+	drawVectorPoints(contours_image, filtered_far_points, color_red, true);
+	drawVectorPoints(contours_image, filtered_finger_points, color_yellow, false);
+	putText(contours_image, to_string(filtered_finger_points.size()), center_bounding_rect, FONT_HERSHEY_PLAIN, 3, color_purple);
 
-	if (show_img) {
+	// and on the starting frame
+	drawContours(frame, contours, biggest_contour_index, color_green, 2, 8, hierarchy);
+	circle(frame, center_bounding_rect, 5, color_purple, 2, 8);
+	drawVectorPoints(frame, filtered_finger_points, color_yellow, false);
+	putText(frame, to_string(filtered_finger_points.size()), center_bounding_rect, FONT_HERSHEY_PLAIN, 3, color_purple);
 
-		// we draw what found
-		Mat contours_image = input_image.clone();
-		cvtColor(contours_image, contours_image, CV_GRAY2BGR);
-
-		drawContours(contours_image, contours, biggest_contour_index, color_green, 2, 8, hierarchy);
-		polylines(contours_image, hull_points, true, color_blue);
-		rectangle(contours_image, bounding_rectangle.tl(), bounding_rectangle.br(), color_red, 2, 8, 0);
-		circle(contours_image, center_bounding_rect, 5, color_purple, 2, 8);
-		drawVectorPoints(contours_image, filtered_start_points, color_blue, true);
-		drawVectorPoints(contours_image, filtered_far_points, color_red, true);
-		drawVectorPoints(contours_image, filtered_finger_points, color_yellow, false);
-		putText(contours_image, to_string(fingers_found), center_bounding_rect, FONT_HERSHEY_PLAIN, 3, color_purple);
-
-		imshow("findFingersCount", contours_image);
-	}
-
-	return fingers_found;
+	return contours_image;
 }
 
 double FingerCount::findPointsDistance(Point a, Point b) {

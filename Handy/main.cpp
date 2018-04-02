@@ -22,7 +22,7 @@ int main(int, char**) {
 		return -1;
 	}
 
-	Mat frame, handMask, foreground;
+	Mat frame, handMask, foreground, fingerCountDebug;
 
 	BackgroundRemover backgroundRemover;
 	SkinDetector skinDetector;
@@ -38,12 +38,12 @@ int main(int, char**) {
 		
 		faceDetector.removeFaces(frame, foreground);
 		handMask = skinDetector.getSkinMask(foreground);
-		fingerCount.findFingersCount(handMask, true);
+		fingerCountDebug = fingerCount.findFingersCount(handMask, frame);
 
 		imshow("output", frame);
 		imshow("foreground", foreground);
 		imshow("handMask", handMask);
-		imshow("fingerCountDebug", handMask);
+		imshow("fingerCountDebug", fingerCountDebug);
 		
 		int key = waitKey(1);
 
