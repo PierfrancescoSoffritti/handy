@@ -32,7 +32,7 @@ Mat FingerCount::findFingersCount(Mat input_image, Mat frame) {
 	vector<vector<Point>> contours;
 	vector<Vec4i> hierarchy;
 
-	findContours(input_image, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
+	findContours(input_image, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
 
 	// we need at least one contour to work
 	if (contours.size() <= 0)
