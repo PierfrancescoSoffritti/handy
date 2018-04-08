@@ -49,7 +49,7 @@ void SkinDetector::calibrate(Mat input) {
 	calibrated = true;
 }
 
-void SkinDetector::calculateThresholds(Mat sample1,Mat sample2) {
+void SkinDetector::calculateThresholds(Mat sample1, Mat sample2) {
 	int offsetMinThreshold = 80;
 	int offsetMaxThreshold = 30;
 
@@ -83,8 +83,8 @@ Mat SkinDetector::getSkinMask(Mat input) {
 
 	performOpening(skinMask, MORPH_ELLIPSE, { 3, 3 }, 2);
 
-	GaussianBlur(skinMask, skinMask, { 3, 3 }, 0);
-	bitwise_and(skinMask, skinMask, skinMask);
+	//GaussianBlur(skinMask, skinMask, { 3, 3 }, 0);
+	//bitwise_and(skinMask, skinMask, skinMask);
 
 	return skinMask;
 }
