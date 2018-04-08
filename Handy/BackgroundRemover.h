@@ -16,4 +16,5 @@ class BackgroundRemover {
 		bool calibrated = false;
 
 		Mat getForegroundMask(Mat input);
+		void BackgroundRemover::removeBackground(Mat input, Mat background);
 };

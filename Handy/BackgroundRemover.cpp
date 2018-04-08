@@ -32,21 +32,23 @@ Mat BackgroundRemover::getForegroundMask(Mat input) {
 
 	cvtColor(input, foregroundMask, CV_BGR2GRAY);
 
-	int offset = 10;
-
-	for (int i = 0; i < foregroundMask.rows; i++) {
-		for (int j = 0; j < foregroundMask.cols; j++) {
-			uchar framePixel = foregroundMask.at<uchar>(i, j);
-			uchar bgPixel = background.at<uchar>(i, j);
-
-			if (framePixel > bgPixel - offset && framePixel < bgPixel + offset)
-				foregroundMask.at<uchar>(i, j) = 0;
-			else
-				foregroundMask.at<uchar>(i, j) = 255;
-		}
-	}
-
-	//imshow("mask", mask);
+	removeBackground(foregroundMask, background);
 	
 	return foregroundMask;
+}
+
+void BackgroundRemover::removeBackground(Mat input, Mat background) {
+	int thresholdOffset = 10;
+
+	for (int i = 0; i < input.rows; i++) {
+		for (int j = 0; j < input.cols; j++) {
+			uchar framePixel = input.at<uchar>(i, j);
+			uchar bgPixel = background.at<uchar>(i, j);
+
+			if (framePixel > bgPixel - thresholdOffset && framePixel < bgPixel + thresholdOffset)
+				input.at<uchar>(i, j) = 0;
+			else
+				input.at<uchar>(i, j) = 255;
+		}
+	}
 }
