@@ -45,7 +45,7 @@ void BackgroundRemover::removeBackground(Mat input, Mat background) {
 			uchar framePixel = input.at<uchar>(i, j);
 			uchar bgPixel = background.at<uchar>(i, j);
 
-			if (framePixel > bgPixel - thresholdOffset && framePixel < bgPixel + thresholdOffset)
+			if (framePixel >= bgPixel - thresholdOffset && framePixel <= bgPixel + thresholdOffset)
 				input.at<uchar>(i, j) = 0;
 			else
 				input.at<uchar>(i, j) = 255;

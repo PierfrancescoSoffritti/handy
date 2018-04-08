@@ -98,6 +98,6 @@ void SkinDetector::performOpening(Mat binaryImage, int kernelShape, Point kernel
 	//erode(binaryImage, binaryImage, kernel, Point(-1, -1), interations);
 	//dilate(binaryImage, binaryImage, kernel, Point(-1, -1), interations);
 
-	Mat structuringElement = getStructuringElement(MORPH_ELLIPSE, Size(3, 3));
+	Mat structuringElement = getStructuringElement(kernelShape, kernelSize);
 	morphologyEx(binaryImage, binaryImage, MORPH_OPEN, structuringElement);
 }
