@@ -81,12 +81,16 @@ Mat SkinDetector::getSkinMask(Mat input) {
 
 	inRange(hsvInput, Scalar(h_min, s_min, v_min), Scalar(h_max, s_max, v_max), skinMask);
 
-	//Mat kernel = getStructuringElement(MORPH_ELLIPSE, { 11, 11 });
-	//erode(skinMask, skinMask, kernel, Point(-1,-1), 1);
-	//dilate(skinMask, skinMask, kernel, Point(-1, -1), 1);
+	performOpening(skinMask, MORPH_ELLIPSE, { 3, 3 }, 2);
 
 	GaussianBlur(skinMask, skinMask, { 3, 3 }, 0);
 	bitwise_and(skinMask, skinMask, skinMask);
 
 	return skinMask;
+}
+
+void SkinDetector::performOpening(Mat binaryImage, int kernelShape, Point kernelSize, int interations) {
+	Mat kernel = getStructuringElement(kernelShape, kernelSize);
+	erode(binaryImage, binaryImage, kernel, Point(-1, -1), interations);
+	dilate(binaryImage, binaryImage, kernel, Point(-1, -1), interations);
 }

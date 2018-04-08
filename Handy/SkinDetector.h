@@ -26,4 +26,5 @@ class SkinDetector {
 		Rect skinColorSamplerRectangle1, skinColorSamplerRectangle2;
 
 		void calculateThresholds(Mat sample1, Mat sample2);
+		void SkinDetector::performOpening(Mat binaryImage, int structuralElementShapde, Point structuralElementSize, int interations);
 };
