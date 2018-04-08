@@ -14,14 +14,16 @@ class SkinDetector {
 		Mat getSkinMask(Mat input);
 
 	private:
-		int H_MIN = 0;
-		int H_MAX = 0;
-		int S_MIN = 0;
-		int S_MAX = 0;
-		int V_MIN = 0;
-		int V_MAX = 0;
+		int h_min = 0;
+		int h_max = 0;
+		int s_min = 0;
+		int s_max = 0;
+		int v_min = 0;
+		int v_max = 0;
 
 		bool calibrated = false;
 
 		Rect skinColorSamplerRectangle1, skinColorSamplerRectangle2;
+
+		void calculateThresholds(vector<Mat> hsvChannelsSample1, vector<Mat> hsvChannelsSample2);
 };
