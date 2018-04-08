@@ -14,12 +14,12 @@ class SkinDetector {
 		Mat getSkinMask(Mat input);
 
 	private:
-		int h_min = 0;
-		int h_max = 0;
-		int s_min = 0;
-		int s_max = 0;
-		int v_min = 0;
-		int v_max = 0;
+		int hLowerThreshold = 0;
+		int hHigherThreshold = 0;
+		int sLowerThreshold = 0;
+		int sHigherThreshold = 0;
+		int vLowerThreshold = 0;
+		int vHigherThreshold = 0;
 
 		bool calibrated = false;
 

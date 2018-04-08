@@ -2,12 +2,12 @@
 #include"opencv2\opencv.hpp"
 
 SkinDetector::SkinDetector(void) {
-	h_min = 0;
-	h_max = 0;
-	s_min = 0;
-	s_max = 0;
-	v_min = 0;
-	v_max = 0;
+	hLowerThreshold = 0;
+	hHigherThreshold = 0;
+	sLowerThreshold = 0;
+	sHigherThreshold = 0;
+	vLowerThreshold = 0;
+	vHigherThreshold = 0;
 
 	calibrated = false;
 
@@ -56,16 +56,16 @@ void SkinDetector::calculateThresholds(Mat sample1, Mat sample2) {
 	Scalar hsv_means_sample1 = mean(sample1);
 	Scalar hsv_means_sample2 = mean(sample2);
 
-	h_min = min(hsv_means_sample1[0], hsv_means_sample2[0]) - offsetMinThreshold;
-	h_max = max(hsv_means_sample1[0], hsv_means_sample2[0]) + offsetMaxThreshold;
+	hLowerThreshold = min(hsv_means_sample1[0], hsv_means_sample2[0]) - offsetMinThreshold;
+	hHigherThreshold = max(hsv_means_sample1[0], hsv_means_sample2[0]) + offsetMaxThreshold;
 
-	s_min = min(hsv_means_sample1[1], hsv_means_sample2[1]) - offsetMinThreshold;
-	s_max = max(hsv_means_sample1[1], hsv_means_sample2[1]) + offsetMaxThreshold;
+	sLowerThreshold = min(hsv_means_sample1[1], hsv_means_sample2[1]) - offsetMinThreshold;
+	sHigherThreshold = max(hsv_means_sample1[1], hsv_means_sample2[1]) + offsetMaxThreshold;
 
-	//v_min = min(hsv_means_sample1[2], hsv_means_sample2[2]) - offsetMinThreshold;
-	//v_max = max(hsv_means_sample1[2], hsv_means_sample2[2]) + offsetMaxThreshold;
-	v_min = 0;
-	v_max = 255;
+	//vLowerThreshold = min(hsv_means_sample1[2], hsv_means_sample2[2]) - offsetMinThreshold;
+	//vHigherThreshold = max(hsv_means_sample1[2], hsv_means_sample2[2]) + offsetMaxThreshold;
+	vLowerThreshold = 0;
+	vHigherThreshold = 255;
 }
 
 Mat SkinDetector::getSkinMask(Mat input) {
@@ -79,7 +79,11 @@ Mat SkinDetector::getSkinMask(Mat input) {
 	Mat hsvInput;
 	cvtColor(input, hsvInput, CV_BGR2HSV);
 
-	inRange(hsvInput, Scalar(h_min, s_min, v_min), Scalar(h_max, s_max, v_max), skinMask);
+	inRange(
+		hsvInput,
+		Scalar(hLowerThreshold, sLowerThreshold, vLowerThreshold),
+		Scalar(hHigherThreshold, sHigherThreshold, vHigherThreshold),
+		skinMask);
 
 	performOpening(skinMask, MORPH_ELLIPSE, { 3, 3 }, 2);
 
@@ -90,7 +94,10 @@ Mat SkinDetector::getSkinMask(Mat input) {
 }
 
 void SkinDetector::performOpening(Mat binaryImage, int kernelShape, Point kernelSize, int interations) {
-	Mat kernel = getStructuringElement(kernelShape, kernelSize);
-	erode(binaryImage, binaryImage, kernel, Point(-1, -1), interations);
-	dilate(binaryImage, binaryImage, kernel, Point(-1, -1), interations);
+	//Mat kernel = getStructuringElement(kernelShape, kernelSize);
+	//erode(binaryImage, binaryImage, kernel, Point(-1, -1), interations);
+	//dilate(binaryImage, binaryImage, kernel, Point(-1, -1), interations);
+
+	Mat structuringElement = getStructuringElement(MORPH_ELLIPSE, Size(3, 3));
+	morphologyEx(binaryImage, binaryImage, MORPH_OPEN, structuringElement);
 }
