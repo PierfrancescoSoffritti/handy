@@ -25,5 +25,5 @@ class SkinDetector {
 
 		Rect skinColorSamplerRectangle1, skinColorSamplerRectangle2;
 
-		void calculateThresholds(vector<Mat> hsvChannelsSample1, vector<Mat> hsvChannelsSample2);
+		void calculateThresholds(Mat sample1, Mat sample2);
 };

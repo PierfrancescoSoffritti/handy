@@ -44,29 +44,28 @@ void SkinDetector::calibrate(Mat input) {
 	Mat sample1 = Mat(hsvInput, skinColorSamplerRectangle1);
 	Mat sample2 = Mat(hsvInput, skinColorSamplerRectangle2);
 
-	vector<Mat> hsvChannelsSample1;
-	vector<Mat> hsvChannelsSample2;
-
-	split(sample1, hsvChannelsSample1);
-	split(sample2, hsvChannelsSample2);
-
-	calculateThresholds(hsvChannelsSample1, hsvChannelsSample2);
+	calculateThresholds(sample1, sample2);
 
 	calibrated = true;
 }
 
-void SkinDetector::calculateThresholds(vector<Mat> hsvChannelsSample1, vector<Mat> hsvChannelsSample2) {
+void SkinDetector::calculateThresholds(Mat sample1,Mat sample2) {
 	int offsetMinThreshold = 80;
 	int offsetMaxThreshold = 30;
 
-	h_min = min(mean(hsvChannelsSample1[0])[0], mean(hsvChannelsSample2[0])[0]) - offsetMinThreshold;
-	h_max = max(mean(hsvChannelsSample1[0])[0], mean(hsvChannelsSample2[0])[0]) + offsetMaxThreshold;
+	Scalar hsv_means_sample1 = mean(sample1);
+	Scalar hsv_means_sample2 = mean(sample2);
 
-	s_min = min(mean(hsvChannelsSample1[1])[0], mean(hsvChannelsSample2[1])[0]) - offsetMinThreshold;
-	s_max = max(mean(hsvChannelsSample1[1])[0], mean(hsvChannelsSample2[1])[0]) + offsetMaxThreshold;
+	h_min = min(hsv_means_sample1[0], hsv_means_sample2[0]) - offsetMinThreshold;
+	h_max = max(hsv_means_sample1[0], hsv_means_sample2[0]) + offsetMaxThreshold;
 
-	v_min = min(mean(hsvChannelsSample1[2])[0], mean(hsvChannelsSample2[2])[0]) - offsetMinThreshold;
-	v_max = max(mean(hsvChannelsSample1[2])[0], mean(hsvChannelsSample2[2])[0]) + offsetMaxThreshold;
+	s_min = min(hsv_means_sample1[1], hsv_means_sample2[1]) - offsetMinThreshold;
+	s_max = max(hsv_means_sample1[1], hsv_means_sample2[1]) + offsetMaxThreshold;
+
+	//v_min = min(hsv_means_sample1[2], hsv_means_sample2[2]) - offsetMinThreshold;
+	//v_max = max(hsv_means_sample1[2], hsv_means_sample2[2]) + offsetMaxThreshold;
+	v_min = 0;
+	v_max = 255;
 }
 
 Mat SkinDetector::getSkinMask(Mat input) {
