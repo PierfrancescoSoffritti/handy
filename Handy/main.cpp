@@ -22,7 +22,7 @@ int main(int, char**) {
 		return -1;
 	}
 
-	Mat frame, handMask, foreground, fingerCountDebug;
+	Mat frame, frameOut, handMask, foreground, fingerCountDebug;
 
 	BackgroundRemover backgroundRemover;
 	SkinDetector skinDetector;
@@ -31,16 +31,17 @@ int main(int, char**) {
 
 	while (true) {
 		videoCapture >> frame;
+		frameOut = frame.clone();
 
-		skinDetector.drawSkinColorSampler(frame);
+		skinDetector.drawSkinColorSampler(frameOut);
 
 		foreground = backgroundRemover.getForeground(frame);
 		
 		faceDetector.removeFaces(frame, foreground);
 		handMask = skinDetector.getSkinMask(foreground);
-		fingerCountDebug = fingerCount.findFingersCount(handMask, frame);
+		fingerCountDebug = fingerCount.findFingersCount(handMask, frameOut);
 
-		imshow("output", frame);
+		imshow("output", frameOut);
 		imshow("foreground", foreground);
 		imshow("handMask", handMask);
 		imshow("fingerCountDebug", fingerCountDebug);
