@@ -1,6 +1,10 @@
 #include "BackgroundRemover.h"
 #include"opencv2\opencv.hpp"
 
+/*
+ Author: Pierfrancesco Soffritti
+*/
+
 BackgroundRemover::BackgroundRemover(void) {
 	background;
 	calibrated = false;

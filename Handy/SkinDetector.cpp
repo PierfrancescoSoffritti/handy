@@ -1,6 +1,10 @@
 #include "SkinDetector.h"
 #include"opencv2\opencv.hpp"
 
+/*
+ Author: Pierfrancesco Soffritti
+*/
+
 SkinDetector::SkinDetector(void) {
 	hLowerThreshold = 0;
 	hHigherThreshold = 0;
@@ -87,17 +91,10 @@ Mat SkinDetector::getSkinMask(Mat input) {
 
 	performOpening(skinMask, MORPH_ELLIPSE, { 3, 3 }, 2);
 
-	//GaussianBlur(skinMask, skinMask, { 3, 3 }, 0);
-	//bitwise_and(skinMask, skinMask, skinMask);
-
 	return skinMask;
 }
 
 void SkinDetector::performOpening(Mat binaryImage, int kernelShape, Point kernelSize, int interations) {
-	//Mat kernel = getStructuringElement(kernelShape, kernelSize);
-	//erode(binaryImage, binaryImage, kernel, Point(-1, -1), interations);
-	//dilate(binaryImage, binaryImage, kernel, Point(-1, -1), interations);
-
 	Mat structuringElement = getStructuringElement(kernelShape, kernelSize);
 	morphologyEx(binaryImage, binaryImage, MORPH_OPEN, structuringElement);
 }

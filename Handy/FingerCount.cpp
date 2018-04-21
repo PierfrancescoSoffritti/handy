@@ -3,6 +3,10 @@
 #include "opencv2/imgproc.hpp"
 #include "opencv2/highgui.hpp"
 
+/*
+Author: Nicolò Castellazzi
+*/
+
 #define LIMIT_ANGLE_SUP 60
 #define LIMIT_ANGLE_INF 5
 #define BOUNDING_RECT_FINGER_SIZE_SCALING 0.3
