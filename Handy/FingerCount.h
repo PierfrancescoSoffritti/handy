@@ -2,6 +2,10 @@
 
 #include "opencv/cv.h"
 
+/*
+ Author: Nicolò Castellazzi
+*/
+
 using namespace cv;
 using namespace std;
 

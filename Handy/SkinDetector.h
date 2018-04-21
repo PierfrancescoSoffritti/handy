@@ -2,6 +2,10 @@
 
 #include<opencv\cv.h>
 
+/*
+ Author: Pierfrancesco Soffritti
+*/
+
 using namespace cv;
 using namespace std;
 
