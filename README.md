@@ -1,2 +1,2 @@
 # Handy
-Hands and gesture recognition program built with OpenCV.
+Hands and gesture recognition with OpenCV.
