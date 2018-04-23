@@ -66,10 +66,10 @@ void SkinDetector::calculateThresholds(Mat sample1, Mat sample2) {
 	sLowerThreshold = min(hsv_means_sample1[1], hsv_means_sample2[1]) - offsetMinThreshold;
 	sHigherThreshold = max(hsv_means_sample1[1], hsv_means_sample2[1]) + offsetMaxThreshold;
 
-	//vLowerThreshold = min(hsv_means_sample1[2], hsv_means_sample2[2]) - offsetMinThreshold;
-	//vHigherThreshold = max(hsv_means_sample1[2], hsv_means_sample2[2]) + offsetMaxThreshold;
-	vLowerThreshold = 0;
-	vHigherThreshold = 255;
+	vLowerThreshold = min(hsv_means_sample1[2], hsv_means_sample2[2]) - offsetMinThreshold;
+	vHigherThreshold = max(hsv_means_sample1[2], hsv_means_sample2[2]) + offsetMaxThreshold;
+	//vLowerThreshold = 0;
+	//vHigherThreshold = 255;
 }
 
 Mat SkinDetector::getSkinMask(Mat input) {
@@ -90,6 +90,8 @@ Mat SkinDetector::getSkinMask(Mat input) {
 		skinMask);
 
 	performOpening(skinMask, MORPH_ELLIPSE, { 3, 3 }, 2);
+
+	dilate(skinMask, skinMask, Mat(), Point(-1, -1), 3);
 
 	return skinMask;
 }
