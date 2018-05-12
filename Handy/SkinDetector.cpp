@@ -6,12 +6,12 @@
 */
 
 SkinDetector::SkinDetector(void) {
-	hLowerThreshold = 0;
-	hHigherThreshold = 0;
-	sLowerThreshold = 0;
-	sHigherThreshold = 0;
-	vLowerThreshold = 0;
-	vHigherThreshold = 0;
+	hLowThreshold = 0;
+	hHighThreshold = 0;
+	sLowThreshold = 0;
+	sHighThreshold = 0;
+	vLowThreshold = 0;
+	vHighThreshold = 0;
 
 	calibrated = false;
 
@@ -54,22 +54,24 @@ void SkinDetector::calibrate(Mat input) {
 }
 
 void SkinDetector::calculateThresholds(Mat sample1, Mat sample2) {
-	int offsetMinThreshold = 80;
-	int offsetMaxThreshold = 30;
+	int offsetLowThreshold = 80;
+	int offsetHighThreshold = 30;
 
 	Scalar hsv_means_sample1 = mean(sample1);
 	Scalar hsv_means_sample2 = mean(sample2);
 
-	hLowerThreshold = min(hsv_means_sample1[0], hsv_means_sample2[0]) - offsetMinThreshold;
-	hHigherThreshold = max(hsv_means_sample1[0], hsv_means_sample2[0]) + offsetMaxThreshold;
+	hLowThreshold = min(hsv_means_sample1[0], hsv_means_sample2[0]) - offsetLowThreshold;
+	hHighThreshold = max(hsv_means_sample1[0], hsv_means_sample2[0]) + offsetHighThreshold;
 
-	sLowerThreshold = min(hsv_means_sample1[1], hsv_means_sample2[1]) - offsetMinThreshold;
-	sHigherThreshold = max(hsv_means_sample1[1], hsv_means_sample2[1]) + offsetMaxThreshold;
+	sLowThreshold = min(hsv_means_sample1[1], hsv_means_sample2[1]) - offsetLowThreshold;
+	sHighThreshold = max(hsv_means_sample1[1], hsv_means_sample2[1]) + offsetHighThreshold;
 
-	vLowerThreshold = min(hsv_means_sample1[2], hsv_means_sample2[2]) - offsetMinThreshold;
-	vHigherThreshold = max(hsv_means_sample1[2], hsv_means_sample2[2]) + offsetMaxThreshold;
-	//vLowerThreshold = 0;
-	//vHigherThreshold = 255;
+	// the V channel shouldn't be used. By ignorint it, shadows on the hand wouldn't interfire with segmentation.
+	// Unfortunately there's a bug somewhere and not using the V channel causes some problem. This shouldn't be too hard to fix.
+	vLowThreshold = min(hsv_means_sample1[2], hsv_means_sample2[2]) - offsetLowThreshold;
+	vHighThreshold = max(hsv_means_sample1[2], hsv_means_sample2[2]) + offsetHighThreshold;
+	//vLowThreshold = 0;
+	//vHighThreshold = 255;
 }
 
 Mat SkinDetector::getSkinMask(Mat input) {
@@ -85,8 +87,8 @@ Mat SkinDetector::getSkinMask(Mat input) {
 
 	inRange(
 		hsvInput,
-		Scalar(hLowerThreshold, sLowerThreshold, vLowerThreshold),
-		Scalar(hHigherThreshold, sHigherThreshold, vHigherThreshold),
+		Scalar(hLowThreshold, sLowThreshold, vLowThreshold),
+		Scalar(hHighThreshold, sHighThreshold, vHighThreshold),
 		skinMask);
 
 	performOpening(skinMask, MORPH_ELLIPSE, { 3, 3 }, 2);

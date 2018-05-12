@@ -7,22 +7,22 @@
 
 Rect getFaceRect(Mat input);
 
-String face_cascade_name = "../res/haarcascade_frontalface_alt.xml";
-CascadeClassifier face_cascade;
+String faceClassifierFileName = "../res/haarcascade_frontalface_alt.xml";
+CascadeClassifier faceCascadeClassifier;
 
 FaceDetector::FaceDetector(void) {
-	if (!face_cascade.load(face_cascade_name))
-		throw runtime_error("can't load file " + face_cascade_name);
+	if (!faceCascadeClassifier.load(faceClassifierFileName))
+		throw runtime_error("can't load file " + faceClassifierFileName);
 }
 
 void FaceDetector::removeFaces(Mat input, Mat output) {
 	vector<Rect> faces;
-	Mat frame_gray;
+	Mat frameGray;
 
-	cvtColor(input, frame_gray, CV_BGR2GRAY);
-	equalizeHist(frame_gray, frame_gray);
+	cvtColor(input, frameGray, CV_BGR2GRAY);
+	equalizeHist(frameGray, frameGray);
 
-	face_cascade.detectMultiScale(frame_gray, faces, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(120, 120));
+	faceCascadeClassifier.detectMultiScale(frameGray, faces, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(120, 120));
 
 	for (size_t i = 0; i < faces.size(); i++) {
 		rectangle(
@@ -42,7 +42,7 @@ Rect getFaceRect(Mat input) {
 	cvtColor(input, inputGray, CV_BGR2GRAY);
 	equalizeHist(inputGray, inputGray);
 
-	face_cascade.detectMultiScale(inputGray, faceRectangles, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(120, 120));
+	faceCascadeClassifier.detectMultiScale(inputGray, faceRectangles, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(120, 120));
 
 	if (faceRectangles.size() > 0)
 		return faceRectangles[0];
