@@ -37,8 +37,8 @@ void SkinDetector::calculateThresholds(Mat sample1, Mat sample2) {
 	int offsetLowThreshold = 80;
 	int offsetHighThreshold = 30;
 
-	Scalar hsv_means_sample1 = mean(sample1);
-	Scalar hsv_means_sample2 = mean(sample2);
+	Scalar hsvMeansSample1 = mean(sample1);
+	Scalar hsvMeansSample2 = mean(sample2);
 
 	hLowThreshold = min(hsv_means_sample1[0], hsv_means_sample2[0]) - offsetLowThreshold;
 	hHighThreshold = max(hsv_means_sample1[0], hsv_means_sample2[0]) + offsetHighThreshold;
