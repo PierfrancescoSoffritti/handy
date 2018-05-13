@@ -54,20 +54,20 @@ After some testing we've found that lowering the minimum thresholds and increasi
 
 ```
 void SkinDetector::calculateThresholds(Mat sample1, Mat sample2) {
-	int offsetLowThreshold = 80;
-	int offsetHighThreshold = 30;
+  int offsetLowThreshold = 80;
+  int offsetHighThreshold = 30;
 
-	Scalar hsvMeansSample1 = mean(sample1);
-	Scalar hsvMeansSample2 = mean(sample2);
+  Scalar hsvMeansSample1 = mean(sample1);
+  Scalar hsvMeansSample2 = mean(sample2);
 
-	hLowThreshold = min(hsvMeansSample1[0], hsvMeansSample2[0]) - offsetLowThreshold;
-	hHighThreshold = max(hsvMeansSample1[0], hsvMeansSample2[0]) + offsetHighThreshold;
+  hLowThreshold = min(hsvMeansSample1[0], hsvMeansSample2[0]) - offsetLowThreshold;
+  hHighThreshold = max(hsvMeansSample1[0], hsvMeansSample2[0]) + offsetHighThreshold;
 
-	sLowThreshold = min(hsvMeansSample1[1], hsvMeansSample2[1]) - offsetLowThreshold;
-	sHighThreshold = max(hsvMeansSample1[1], hsvMeansSample2[1]) + offsetHighThreshold;
+  sLowThreshold = min(hsvMeansSample1[1], hsvMeansSample2[1]) - offsetLowThreshold;
+  sHighThreshold = max(hsvMeansSample1[1], hsvMeansSample2[1]) + offsetHighThreshold;
 
-	vLowThreshold = 0;
-	vHighThreshold = 255;
+  vLowThreshold = 0;
+  vHighThreshold = 255;
 }
 ```
 
@@ -85,8 +85,8 @@ performOpening(skinMask, MORPH_ELLIPSE, { 3, 3 });
 dilate(skinMask, skinMask, Mat(), Point(-1, -1), 3);
 
 void SkinDetector::performOpening(Mat binaryImage, int kernelShape, Point kernelSize) {
-	Mat structuringElement = getStructuringElement(kernelShape, kernelSize);
-	morphologyEx(binaryImage, binaryImage, MORPH_OPEN, structuringElement);
+  Mat structuringElement = getStructuringElement(kernelShape, kernelSize);
+  morphologyEx(binaryImage, binaryImage, MORPH_OPEN, structuringElement);
 }	
 ```
 
@@ -119,19 +119,19 @@ More in detail:
 
 ```
 void BackgroundRemover::removeBackground(Mat input, Mat background) {
-	int thresholdOffset = 10;
+  int thresholdOffset = 10;
 
-	for (int i = 0; i < input.rows; i++) {
-		for (int j = 0; j < input.cols; j++) {
-			uchar framePixel = input.at<uchar>(i, j);
-			uchar bgPixel = background.at<uchar>(i, j);
-
-			if (framePixel >= bgPixel - thresholdOffset && framePixel <= bgPixel + thresholdOffset)
-				input.at<uchar>(i, j) = 0;
-			else
-				input.at<uchar>(i, j) = 255;
-		}
-	}
+  for (int i = 0; i < input.rows; i++) {
+    for (int j = 0; j < input.cols; j++) {
+      uchar framePixel = input.at<uchar>(i, j);
+      uchar bgPixel = background.at<uchar>(i, j);
+    
+      if (framePixel >= bgPixel - thresholdOffset && framePixel <= bgPixel + thresholdOffset)
+        input.at<uchar>(i, j) = 0;
+      else
+        input.at<uchar>(i, j) = 255;
+    }
+  }
 }
 ```
 
