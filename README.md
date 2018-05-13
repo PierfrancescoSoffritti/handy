@@ -1,5 +1,5 @@
 # Handy
-Handy is a hands recognition software written in C++ using OpenCV v3.4.1. The software is capable of recognizing hands in an video and of counting the number of lifted fingers.
+Handy is a hands detection software written in C++ using OpenCV v3.4.1. The software is capable of recognizing hands in an video and of counting the number of lifted fingers.
 
 ## Software assumptions
 A few assumptions have been made:
