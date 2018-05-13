@@ -17,13 +17,16 @@ This software has been developed on Visual Studio 14 using OpenCV v3.4.1. If you
 
 Remember to create an environment variable called `OPENCV_PATH` that points to the build folder of OpenCV (eg: C:\Users\UserName\Documents\opencv\build). Otherwise you will need to update the properties of the project so that it knows where OpenCV is on your machine.
 
+#### Camera configuration
 After running the program (just run the [main](https://github.com/PierfrancescoSoffritti/Handy/blob/master/Handy/main.cpp)) you will be presented with a window where you can configure your webcam. For this program to work properly all the automatic settings of your webcam have to be disabled (auto-focus, auto-brightness etc).
 
+#### Software usage
 After configuring your webcam you can close the window. You'll now have four black windows. To use the program perform this sequence of actions:
 1. Without showing your hand in the frame, press the "B" key on your keyboard. It will start the process of background removal.
 2. Move your hand so that it completely covers the two purple rectagles shown in the window called "output". Press the "S" key on your keyboard. This will sample the color of your skin and start the process of hand detection.
 3. When you want to close the program press the "esc" key on your keyboard.
 
+#### Windows description
 - The "output" window shows the output of the application. That is the RGB frame with the contour of the hand and a number corresponding to the number of lifted fingers.
 - The "foreground" window shows the output of the background removal operation. From here you can easily see if background removal is performed correctly or not. If not, recalibrate by pressing "B".
 - The "handMask" window shows the output of the whole binarization process. Thats the image that is used for detecting the hand and counting its fingers.
