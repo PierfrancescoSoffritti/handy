@@ -150,7 +150,7 @@ Now we can analyze our arrays in order to locate fingers.
 
 For each point in the finger tips array we look in the defects array for the two nearest points on the x axis. We now have three points: one is a fingertip candidate (we aren't sure at this point), the others are "local minimum" representing the concavities of the hand.
 
-___tips_and_defects.png___
+![finger tips and convex hull defects](https://raw.githubusercontent.com/PierfrancescoSoffritti/Handy/master/pictures/tips_and_defects.png)
 
 To determine if the point is really a fingertip, we do the following operations:
 1. Check that the angle between the three points is within specied limits (usually the angle between the tip of our finger and the two closest concavities is within a certain range).
