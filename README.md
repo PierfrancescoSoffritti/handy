@@ -15,22 +15,22 @@ ___add gif___
 ## Usage
 This software has been developed on Visual Studio 14 using OpenCV v3.4.1. If you are using the same development environment you can simply clone the project and open it in Visual Studio.
 
-Remember to create an environment variable called `OPENCV_PATH` that points to the build folder of OpenCV (eg: C:\Users\UserName\Documents\opencv\build). Otherwise you will need to update the properties of the project so that it knows where OpenCV is on your machine.
+Remember to create an environment variable called `OPENCV_PATH` that points to the build folder of OpenCV (eg: `C:\Users\UserName\Documents\opencv\build`). Otherwise you will need to update the properties of the project so that it knows where OpenCV is on your machine.
 
 #### Camera configuration
 After running the program (just run the [main](https://github.com/PierfrancescoSoffritti/Handy/blob/master/Handy/main.cpp)) you will be presented with a window where you can configure your webcam. For this program to work properly all the automatic settings of your webcam have to be disabled (auto-focus, auto-brightness etc).
 
 #### Software usage
 After configuring your webcam you can close the window. You'll now have four black windows. To use the program perform this sequence of actions:
-1. Without showing your hand in the frame, press the "B" key on your keyboard. It will start the process of background removal.
-2. Move your hand so that it completely covers the two purple rectagles shown in the window called "output". Press the "S" key on your keyboard. This will sample the color of your skin and start the process of hand detection.
-3. When you want to close the program press the "esc" key on your keyboard.
+1. Without showing your hand in the frame, press the `B` key on your keyboard. It will start the process of background removal.
+2. Move your hand so that it completely covers the two purple rectagles shown in the window called `output`. Press the `S` key on your keyboard. This will sample the color of your skin and start the process of hand detection.
+3. When you want to close the program press the `esc` key on your keyboard.
 
 #### Windows description
-- The "output" window shows the output of the application. That is the RGB frame with the contour of the hand and a number corresponding to the number of lifted fingers.
-- The "foreground" window shows the output of the background removal operation. From here you can easily see if background removal is performed correctly or not. If not, recalibrate by pressing "B".
-- The "handMask" window shows the output of the whole binarization process. Thats the image that is used for detecting the hand and counting its fingers.
-- The "handDetection" window shows the output of the hand and finger detection process. The numbers shown here correspond to the index of the points in the arrays (read below).
+- The `output` window shows the output of the application. That is the RGB frame with the contour of the hand and a number corresponding to the number of lifted fingers.
+- The `foreground` window shows the output of the background removal operation. From here you can easily see if background removal is performed correctly or not. If not, recalibrate by pressing `B`.
+- The `handMask` window shows the output of the whole binarization process. Thats the image that is used for detecting the hand and counting its fingers.
+- The `handDetection` window shows the output of the hand and finger detection process. The numbers shown here correspond to the index of the points in the arrays (read below).
 
 ## Hand segmentation
 With segmentation we refer to the process of extracting objects of interest from an image. In our case, the object of interest is the hand of the user.
@@ -40,7 +40,7 @@ There are many possible approaches to solve this problem, each with different co
 We decided that the best approach to solve our problem, in terms of complexity and reliability, is to segment the hand starting from the color of the user's skin. The idea is quite simple: find the color of the user's skin and use it as a threshold to binarize the image.
 
 ### How to find the color of the user's skin
-In order to find the skin color we decided to designate two specic areas of the screen as "sample areas". The user has to move his hand in the frame so that it covers the two sample areas. When the "S" key is pressend on the keyboard, the program saves the images contained in the sample areas, makes an average of the colors and then uses those two averaged colors as lower and higher thresholds to find the user's skin.
+In order to find the skin color we decided to designate two specic areas of the screen as "sample areas". The user has to move his hand in the frame so that it covers the two sample areas. When the `S` key is pressend on the keyboard, the program saves the images contained in the sample areas, makes an average of the colors and then uses those two averaged colors as lower and higher thresholds to find the user's skin.
 
 This solution is extremely simple and could be impoved in many ways. For example accuracy could be improved by taking more samples over time, to account for noise and light variations.
 
@@ -144,7 +144,7 @@ Background removal, applied before the binarization of the image, gave us good r
 
 Despite working well this approach has many problems and limitation, if the background isn't static or if the illumination of the scene changes, it doesn't work.
 
-To increase the flexibility of our program we assigned a key to the keyboard (the "B" key) that the user can press to replace the reference frame with the current frame. Even if the initial background changes (invalidating the original reference frame), the user can easily take a new sample.
+To increase the flexibility of our program we assigned a key to the keyboard (the `B` key) that the user can press to replace the reference frame with the current frame. Even if the initial background changes (invalidating the original reference frame), the user can easily take a new sample.
 
 ___add image without background___
 
