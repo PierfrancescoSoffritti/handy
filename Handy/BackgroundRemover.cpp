@@ -2,7 +2,7 @@
 #include"opencv2\opencv.hpp"
 
 /*
- Author: Pierfrancesco Soffritti
+ Author: Pierfrancesco Soffritti https://github.com/PierfrancescoSoffritti
 */
 
 BackgroundRemover::BackgroundRemover(void) {

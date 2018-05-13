@@ -44,7 +44,7 @@ int main(int, char**) {
 		imshow("output", frameOut);
 		imshow("foreground", foreground);
 		imshow("handMask", handMask);
-		imshow("fingerCountDebug", fingerCountDebug);
+		imshow("handDetection", fingerCountDebug);
 		
 		int key = waitKey(1);
 

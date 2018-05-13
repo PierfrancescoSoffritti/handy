@@ -3,7 +3,7 @@
 #include<opencv\cv.h>
 
 /*
- Author: Pierfrancesco Soffritti
+ Author: Pierfrancesco Soffritti https://github.com/PierfrancescoSoffritti
 */
 
 using namespace cv;

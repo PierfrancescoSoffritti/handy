@@ -3,7 +3,7 @@
 #include "opencv/cv.h"
 
 /*
- Author: Nicolò Castellazzi
+ Author: Nicolò Castellazzi https://github.com/nicast
 */
 
 using namespace cv;

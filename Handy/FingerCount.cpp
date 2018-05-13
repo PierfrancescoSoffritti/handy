@@ -4,7 +4,7 @@
 #include "opencv2/highgui.hpp"
 
 /*
- Author: Nicolò Castellazzi
+ Author: Nicolò Castellazzi https://github.com/nicast
 */
 
 #define LIMIT_ANGLE_SUP 60
