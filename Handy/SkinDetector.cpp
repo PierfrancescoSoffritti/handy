@@ -57,19 +57,19 @@ void SkinDetector::calculateThresholds(Mat sample1, Mat sample2) {
 	int offsetLowThreshold = 80;
 	int offsetHighThreshold = 30;
 
-	Scalar hsv_means_sample1 = mean(sample1);
-	Scalar hsv_means_sample2 = mean(sample2);
+	Scalar hsvMeansSample1 = mean(sample1);
+	Scalar hsvMeansSample2 = mean(sample2);
 
-	hLowThreshold = min(hsv_means_sample1[0], hsv_means_sample2[0]) - offsetLowThreshold;
-	hHighThreshold = max(hsv_means_sample1[0], hsv_means_sample2[0]) + offsetHighThreshold;
+	hLowThreshold = min(hsvMeansSample1[0], hsvMeansSample2[0]) - offsetLowThreshold;
+	hHighThreshold = max(hsvMeansSample1[0], hsvMeansSample2[0]) + offsetHighThreshold;
 
-	sLowThreshold = min(hsv_means_sample1[1], hsv_means_sample2[1]) - offsetLowThreshold;
-	sHighThreshold = max(hsv_means_sample1[1], hsv_means_sample2[1]) + offsetHighThreshold;
+	sLowThreshold = min(hsvMeansSample1[1], hsvMeansSample2[1]) - offsetLowThreshold;
+	sHighThreshold = max(hsvMeansSample1[1], hsvMeansSample2[1]) + offsetHighThreshold;
 
 	// the V channel shouldn't be used. By ignorint it, shadows on the hand wouldn't interfire with segmentation.
 	// Unfortunately there's a bug somewhere and not using the V channel causes some problem. This shouldn't be too hard to fix.
-	vLowThreshold = min(hsv_means_sample1[2], hsv_means_sample2[2]) - offsetLowThreshold;
-	vHighThreshold = max(hsv_means_sample1[2], hsv_means_sample2[2]) + offsetHighThreshold;
+	vLowThreshold = min(hsvMeansSample1[2], hsvMeansSample2[2]) - offsetLowThreshold;
+	vHighThreshold = max(hsvMeansSample1[2], hsvMeansSample2[2]) + offsetHighThreshold;
 	//vLowThreshold = 0;
 	//vHighThreshold = 255;
 }
@@ -91,14 +91,13 @@ Mat SkinDetector::getSkinMask(Mat input) {
 		Scalar(hHighThreshold, sHighThreshold, vHighThreshold),
 		skinMask);
 
-	performOpening(skinMask, MORPH_ELLIPSE, { 3, 3 }, 2);
-
+	performOpening(skinMask, MORPH_ELLIPSE, { 3, 3 });
 	dilate(skinMask, skinMask, Mat(), Point(-1, -1), 3);
 
 	return skinMask;
 }
 
-void SkinDetector::performOpening(Mat binaryImage, int kernelShape, Point kernelSize, int interations) {
+void SkinDetector::performOpening(Mat binaryImage, int kernelShape, Point kernelSize) {
 	Mat structuringElement = getStructuringElement(kernelShape, kernelSize);
 	morphologyEx(binaryImage, binaryImage, MORPH_OPEN, structuringElement);
 }
