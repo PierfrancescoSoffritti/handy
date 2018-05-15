@@ -10,7 +10,9 @@ A few assumptions have been made:
 
 We decided not to add invasive constraints such as forcing the user to wear gloves, in order to change the color of his hands, or to have a specic illumination in the scene.
 
-___add gif___
+A demo of this software can be watched [here](https://www.youtube.com/watch?v=z8rWGQyIQAE).
+
+![gif demo](https://gifs.com/gif/handy-opensource-opencv-hands-detection-software-nrkErP)
 
 ## Usage
 This software has been developed on Visual Studio 14 using OpenCV v3.4.1. If you are using the same development environment you can simply clone the project and open it in Visual Studio.
@@ -27,10 +29,10 @@ After configuring your webcam you can close the window. You'll now have four bla
 3. When you want to close the program press the `esc` key on your keyboard.
 
 #### Windows description
-- The `output` window shows the output of the application. That is the RGB frame with the contour of the hand and a number corresponding to the number of lifted fingers.
+- The `output` window shows the output of the application. That is the RGB frame with the contour of the hand and a number corresponding to the number of lifted fingers. The purple number at the center of the hand represents the number of lifted fingers detected by the software.
 - The `foreground` window shows the output of the background removal operation. From here you can easily see if background removal is performed correctly or not. If not, recalibrate by pressing `B`.
 - The `handMask` window shows the output of the whole binarization process. Thats the image that is used for detecting the hand and counting its fingers.
-- The `handDetection` window shows the output of the hand and finger detection process. The numbers shown here correspond to the index of the points in the arrays (read below).
+- The `handDetection` window shows the output of the hand and finger detection process. The numbers shown here correspond to the index of the points in the arrays (read below). The purple number at the center of the hand represents the number of lifted fingers detected by the software.
 
 ## Hand segmentation
 With segmentation we refer to the process of extracting objects of interest from an image. In our case, the object of interest is the hand of the user.
@@ -93,7 +95,7 @@ void SkinDetector::performOpening(Mat binaryImage, int kernelShape, Point kernel
 }	
 ```
 
-___add binarized image___
+___final binary image___
 
 ### Remove the user's face
 The skin of the user is now the object of our binary image.
@@ -104,7 +106,6 @@ The problem of face detection is solved using one of the face classiers provide
 
 The code responsible for this part can be found [here](https://github.com/PierfrancescoSoffritti/Handy/blob/master/Handy/FaceDetector.cpp).
 
-___add binary image without user face___
 
 ### Background removal
 At this point the program is working but, due to the unpredictability of the scene conditions, it is not particularly reliable. A simple change of illumination or a background with a color too similar to the color of the user's skin may give a lot of false positives.
