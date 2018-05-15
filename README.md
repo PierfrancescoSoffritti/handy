@@ -12,7 +12,7 @@ We decided not to add invasive constraints such as forcing the user to wear glov
 
 A demo of this software can be watched [here](https://www.youtube.com/watch?v=z8rWGQyIQAE).
 
-![gif demo](https://gifs.com/gif/handy-opensource-opencv-hands-detection-software-nrkErP)
+![gif demo](https://j.gifs.com/nrkErP.gif)
 
 ## Usage
 This software has been developed on Visual Studio 14 using OpenCV v3.4.1. If you are using the same development environment you can simply clone the project and open it in Visual Studio.
@@ -48,7 +48,7 @@ This solution is extremely simple and could be impoved in many ways. For example
 
 The code responsible for this part can be found [here](https://github.com/PierfrancescoSoffritti/Handy/blob/master/Handy/SkinDetector.cpp).
 
-___add sample areas image___
+![sample areas image](https://raw.githubusercontent.com/PierfrancescoSoffritti/Handy/master/pictures/sample_areas.png)
 
 #### Threshold calculation
 The image is first converted to the HSV color space. After some testing this color space resulted the most resisted to changes of shade and tonality of the color, but is not the only option, YCrCb was also giving good results. The most signicant advantage we had using HSV was the ability to ignore shadows on the hand, simply by ignoring the third channel.
@@ -95,7 +95,7 @@ void SkinDetector::performOpening(Mat binaryImage, int kernelShape, Point kernel
 }	
 ```
 
-___final binary image___
+![final binary image](https://raw.githubusercontent.com/PierfrancescoSoffritti/Handy/master/pictures/binary_image.png)
 
 ### Remove the user's face
 The skin of the user is now the object of our binary image.
@@ -147,7 +147,7 @@ Despite working well this approach has many problems and limitation, if the back
 
 To increase the flexibility of our program we assigned a key to the keyboard (the `B` key) that the user can press to replace the reference frame with the current frame. Even if the initial background changes (invalidating the original reference frame), the user can easily take a new sample.
 
-___add image without background___
+![foreground](https://raw.githubusercontent.com/PierfrancescoSoffritti/Handy/master/pictures/foreground.png)
 
 ## Hand and finger detection
 
@@ -184,7 +184,7 @@ To remove false positives, every point following the fifth fingertip is removed
 
 The code responsible for this part can be found [here](https://github.com/PierfrancescoSoffritti/Handy/blob/master/Handy/FingerCount.cpp).
 
-___add contour and points image___
+![hand contour](https://raw.githubusercontent.com/PierfrancescoSoffritti/Handy/master/pictures/contour.png)
 
 ## Limitations and possible improvements
 * The accuracy of this solution is not the always the best and the program may need to be tuned differently for different environments.
