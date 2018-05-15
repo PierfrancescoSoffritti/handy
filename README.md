@@ -12,7 +12,7 @@ We decided not to add invasive constraints such as forcing the user to wear glov
 
 A demo of this software can be watched [here](https://www.youtube.com/watch?v=z8rWGQyIQAE).
 
-![gif demo](https://j.gifs.com/nrkErP.gif)
+![gif demo](https://j.gifs.com/6RN3Xz.gif)
 
 ## Usage
 This software has been developed on Visual Studio 14 using OpenCV v3.4.1. If you are using the same development environment you can simply clone the project and open it in Visual Studio.
