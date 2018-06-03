@@ -5,10 +5,10 @@ Handy is a hands detection software written in C++ using OpenCV v3.4.1. The soft
 A few assumptions have been made:
 1. The camera is supposed to be static.
 2. The camera has no automatic regulations, such as auto-focus etc.
-3. The user is not moving in the frame (eg: he sits in front of the camera).
-4. There are no particular constraints on the color of the background but it should be approximately static (no moving objects/strong changes of illumination in the background).
+3. The user is not moving in the frame (eg: he sits at his desk in front of the camera).
+4. There are no particular constraints on the color of the background, but it should be approximately static (no moving objects/strong changes of illumination in the background).
 
-We decided not to add invasive constraints such as forcing the user to wear gloves, in order to change the color of his hands, or to have a specic illumination in the scene.
+We decided not to add invasive constraints such as forcing the user to wear gloves, in order to change the color of his hands, or to have a specific illumination in the scene.
 
 A demo of this software can be watched [here](https://www.youtube.com/watch?v=z8rWGQyIQAE).
 
@@ -41,8 +41,8 @@ There are many possible approaches to solve this problem, each with different co
 
 We decided that the best approach to solve our problem, in terms of complexity and reliability, is to segment the hand starting from the color of the user's skin. The idea is quite simple: find the color of the user's skin and use it as a threshold to binarize the image.
 
-### How to find the color of the user's skin
-In order to find the skin color we decided to designate two specic areas of the screen as "sample areas". The user has to move his hand in the frame so that it covers the two sample areas. When the `S` key is pressend on the keyboard, the program saves the images contained in the sample areas, makes an average of the colors and then uses those two averaged colors as lower and higher thresholds to find the user's skin.
+### How to find the color of the user's skin
+In order to find the skin color we decided to designate two specific areas of the screen as "sample areas". The user has to move his hand in the frame so that it covers the two sample areas. When the `S` key is pressed on the keyboard, the program saves the images contained in the sample areas, makes an average of the colors and then uses those two averaged colors as lower and higher thresholds to find the user's skin.
 
 This solution is extremely simple and could be impoved in many ways. For example accuracy could be improved by taking more samples over time, to account for noise and light variations.
 
@@ -51,11 +51,11 @@ The code responsible for this part can be found [here](https://github.com/Pierfr
 ![sample areas image](https://raw.githubusercontent.com/PierfrancescoSoffritti/Handy/master/pictures/sample_areas.png)
 
 #### Threshold calculation
-The image is first converted to the HSV color space. After some testing this color space resulted the most resisted to changes of shade and tonality of the color, but is not the only option, YCrCb was also giving good results. The most signicant advantage we had using HSV was the ability to ignore shadows on the hand, simply by ignoring the third channel.
+The image is first converted to the HSV color space. After some testing this color space resulted the most resisted to changes of shade and tonality of the color, but is not the only option, YCrCb was also giving good results. The most significant advantage of using HSV is the ability to ignore shadows on the hand, simply by ignoring the third channel.
 
-The samples images are divided in their three channels: H, S and V. For each channel we calculate the mean value, from there low and high threshold values are computed, except for the value channel (V).
+The samples images are divided in their three channels: H, S and V. For each channel we calculate the mean value, from there low and high threshold values are computed, except for the "value" channel (V).
 
-After some testing we've found that lowering the minimum thresholds and increasing the higher thresholds by a constant amount yields better results.
+After some testing we've found that lowering the low thresholds and increasing the high thresholds by a constant amount yields better results.
 
 ```
 void SkinDetector::calculateThresholds(Mat sample1, Mat sample2) {
@@ -77,11 +77,11 @@ void SkinDetector::calculateThresholds(Mat sample1, Mat sample2) {
 ```
 
 #### Binarization
-For the binarization of the frame OpenCV's `inRange` function is used. The operator simply sets to 1 all the pixels contained between the low and high thresholds and to 0 all the other pixels.
+The binarization of the frame is done using OpenCV's `inRange` function. The operator simply sets to 1 all the pixels contained between the low and high thresholds and to 0 all the other pixels.
 
 `inRange(hsvInput, Scalar(hLowThreshold, sLowThreshold, vLowThreshold), Scalar(hHighThreshold, sHighThreshold, vHighThreshold), skinMask);`
 
-After the binarization the image resulted a bit noisy, because of false positives. To clean the image and remove the false positives an opening operator is applied, with a 3x3 circular structuring element.
+After the binarization the image resulted a bit noisy, because of false positives. To clean the image and remove the false positives, an opening operator is applied, with a 3x3 circular structuring element.
 
 A dilation is also applied, just in case parts of the hands have been detached after the binarization (sometimes fingers are detached from the hand).
 
@@ -89,7 +89,7 @@ A dilation is also applied, just in case parts of the hands have been detached a
 performOpening(skinMask, MORPH_ELLIPSE, { 3, 3 });
 dilate(skinMask, skinMask, Mat(), Point(-1, -1), 3);
 
-void SkinDetector::performOpening(Mat binaryImage, int kernelShape, Point kernelSize) {
+void performOpening(Mat binaryImage, int kernelShape, Point kernelSize) {
   Mat structuringElement = getStructuringElement(kernelShape, kernelSize);
   morphologyEx(binaryImage, binaryImage, MORPH_OPEN, structuringElement);
 }	
@@ -98,11 +98,11 @@ void SkinDetector::performOpening(Mat binaryImage, int kernelShape, Point kernel
 ![final binary image](https://raw.githubusercontent.com/PierfrancescoSoffritti/Handy/master/pictures/binary_image.png)
 
 ### Remove the user's face
-The skin of the user is now the object of our binary image.
-Along with the user's hands, the user's face is also part of our object. This is obviosly not desirable. 
+The skin of the user is now the object in our binary image.
+Along with the user's hands, the user's face is also part of our object. This is obviously not desirable. 
 
-To prevent our algorithm from picking up the face of the user, before the binarization of the image the user's face is detected and removed by drawing a black rectagle over it.
-The problem of face detection is solved using one of the face classiers provided by OpenCV.
+To prevent our algorithm from picking up the face of the user, before the binarization of the image the user's face is detected and removed by drawing a black rectangle over it.
+The problem of face detection is solved using one of the face classifiers provided by OpenCV.
 
 The code responsible for this part can be found [here](https://github.com/PierfrancescoSoffritti/Handy/blob/master/Handy/FaceDetector.cpp).
 
@@ -111,9 +111,9 @@ The code responsible for this part can be found [here](https://github.com/Pierfr
 At this point the program is working but, due to the unpredictability of the scene conditions, it is not particularly reliable. A simple change of illumination or a background with a color too similar to the color of the user's skin may give a lot of false positives.
 In order to solve this problem we decided to add an extra step to our process: background removal, before binarization.
 
-In a first approach we tried to use dynamic background subtraction. Theproblem with this solution is that the hand has to always move, otherwise it is classied as background and then removed.
+In a first approach we tried to use dynamic background subtraction. The problem with this solution is that the hand has to always move, otherwise it is classified as background and then removed.
 
-Considering that this application is supposed to be used indoors, ideally at a desk, we can assume our image to be static (it doesn't change signicantly over time). We decided to save a frame (converted to grayscale), and use it as a reference for background removal.
+Considering that this application is supposed to be used indoors, ideally at a desk, we can assume our image to be static (it doesn't change significantly over time). We decided to save a frame (converted to grayscale), and use it as a reference for background removal.
 
 When the application starts the first frame is saved as reference. Then for each new frame we simply iterate over each pixel of the frame and compare it to the correspondig pixel in the reference frame. If the pixel in the current frame differs by a certain amount from the corresponding pixel in the reference frame it is not removed, otherwise the pixel is classified as background and removed.
 
@@ -152,9 +152,9 @@ To increase the flexibility of our program we assigned a key to the keyboard (th
 ## Hand and finger detection
 
 ### Hand contour
-Now that we have the binary image, we use OpenCV's function `findContours` to get the contours of all objects in the image. From these we select the contour with the biggest area. If the binarization of the image has been done correctly, this contour should be the one of our hand.
+Now that we have the binary image, we use OpenCV's function `findContours` to get the contours of all objects in the image. From these we select the contour with the biggest area. If the binarization of the image has been done correctly, this contour should be the one of our hand.
 
-At this point we look for the smallest convex set containing the hand contour, using the `convexHull` function. We then construct the bounding rectangle of the convex hull. The rectalge can be used to approximate the center of the hand and will be also used to do scale invariant computations.
+At this point we look for the smallest convex set containing the hand contour, using the `convexHull` function. We then construct the bounding rectangle of the convex hull. The rectangle can be used to calculate an approximation of the center of the hand and to do scale invariant computations.
 
 The code responsible for this part can be found [here](https://github.com/PierfrancescoSoffritti/Handy/blob/master/Handy/FingerCount.cpp).
 
