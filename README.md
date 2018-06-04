@@ -158,29 +158,29 @@ At this point we look for the smallest convex set containing the hand contour, u
 
 The code responsible for this part can be found [here](https://github.com/PierfrancescoSoffritti/Handy/blob/master/Handy/FingerCount.cpp).
 
-### Fingers identification
+### Fingers identification
 The points of intersection between the hand contour and convex hull are saved in an array, they will be used to locate the finger tips.
 
-Using the `convexityDefects` function, we get all the defects of the contour and we save them in another array. These are the lowest points between one finger and the other. We can use the two arrays to make assumptions about the number of lifted fingers in the image.
+Using the `convexityDefects` function, we get all the defects of the contour and we save them in another array. These are the lowest points between one finger and the other. We can use the two arrays to make assumptions about the number of lifted fingers in the image.
 
-`convexityDefects` usually returns more points than we need, therefore we have to filter them. We filter them based on their distance from the center of the bounding rectangle (which approximately corresponds to the center of the hand), so that we keep only the lowest points between each finger. In order to make this process scale invariant, we use the height of the bounding rectangle as reference.
+`convexityDefects` usually returns more points than we need, therefore we have to filter them. We filter them based on their distance from the center of the bounding rectangle (which approximately corresponds to the center of the hand), so that we keep only the lowest points between each finger. In order to make this process scale invariant, we use the height of the bounding rectangle as reference.
 
-Both arrays (farthest points from the convex hull and closest points to the convex hull) are then filtered again, we need exactly one point for each finger tip and one point between each finger. To do that all points are averaged using a chosen neighborhood. For each point, all the points within a certain distance are averaged to a single point.
+Both arrays (farthest points from the convex hull and closest points to the convex hull) are then filtered again, we need exactly one point for each finger tip and one point between each finger. To do that all points are averaged using a chosen neighborhood: for each point, all the points within a certain distance are averaged to a single point.
 
-Now we can analyze our arrays in order to locate fingers.
+Now we can analyze our arrays in order to detect fingers.
 
-For each point in the finger tips array we look in the defects array for the two nearest points on the x axis. We now have three points: one is a fingertip candidate (we aren't sure at this point), the others are "local minimum" representing the concavities of the hand.
+For each point in the finger tips array we look in the defects array for the two nearest points on the x axis. We now have three points: one is a fingertip candidate (we aren't sure yet, the others are "local minimum" representing the concavities of the hand.
 
 ![finger tips and convex hull defects](https://raw.githubusercontent.com/PierfrancescoSoffritti/Handy/master/pictures/tips_and_defects.png)
 
-To determine if the point is really a fingertip, we do the following operations:
-1. Check that the angle between the three points is within specied limits (usually the angle between the tip of our finger and the two closest concavities is within a certain range).
-2. Check that the finger tip is not below the two concavity points (our hand is supposed not to be upside down).
-3. Check that the two concavity points are not below the center of the hand (in the case of the thumb and pinkie fingers one point is allowed to be under the center, but both would be anatomically incorrect).
+To determine if the point is really a fingertip, the following steps are performed:
+1. Check that the angle between the three points is within specified limits (usually the angle between the tip of our finger and the two closest concavities is within a certain range).
+2. Check that the y coordinate of the finger tip is not lower than the y coordinates of the two concavity points (our hand is supposed not to be upside down).
+3. Check that the y coordinates of the two concavity points are not lower than the y coordinate of the center of the hand (in the case of the thumb and pinkie fingers one point is allowed to be below the center, but both would be anatomically incorrect).
 4. Check that the distance between the center of the hand and the finger tip is greater than a chosen limit, scaled with the height of the bounding rectangle (fingers shouldn't be too small or big compared to the size of the hand).
-5. To increase accuracy for the case in which we have zero lifted finger, we check that all the concavity points have a minimum distance from the center of the hand. This minimum distance is scaled using the height of the bounding rectangle.
+5. To increase accuracy for the case in which we have no lifted finger, we check that all the concavity points have a minimum distance from the center of the hand. This minimum distance is scaled using the height of the bounding rectangle.
 
-To remove false positives, every point following the fifth fingertip is removed.
+To remove false positives, every point following the fifth fingertip is removed.
 
 The code responsible for this part can be found [here](https://github.com/PierfrancescoSoffritti/Handy/blob/master/Handy/FingerCount.cpp).
 
@@ -190,4 +190,4 @@ The code responsible for this part can be found [here](https://github.com/Pierfr
 * The accuracy of this solution is not the always the best and the program may need to be tuned differently for different environments.
 * This sofware has been written with limited knowledge of both OpenCV and C++, there's probably plenty of room for optimizations and performance improvements.
 * As mentioned before, the samples of the user's skins are collocted in an exremely simplistic way. There's a lot of room for improvements here.
-* Some part of the application relie on a few "magic numbers" (hardcoded constants), it would be ideal to find a way to remove them.
+* Some part of the application rely on a few "magic numbers" (hardcoded constants), it would be ideal to find a way to get rid of them.
