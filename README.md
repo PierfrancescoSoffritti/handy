@@ -10,7 +10,7 @@ A few assumptions have been made:
 
 We decided not to add invasive constraints such as forcing the user to wear gloves, in order to change the color of his hands, or to have a specific illumination in the scene.
 
-A demo of this software can be watched [here](https://www.youtube.com/watch?v=z8rWGQyIQAE).
+A demo can be watched [here](https://www.youtube.com/watch?v=z8rWGQyIQAE).
 
 ![gif demo](https://j.gifs.com/pQmJ8m.gif)
 
@@ -37,7 +37,7 @@ After configuring your webcam you can close the window. You'll now have four bla
 ## Hand segmentation
 With segmentation we refer to the process of extracting objects of interest from an image. In our case, the object of interest is the hand of the user.
 
-There are many possible approaches to solve this problem, each with different complexity and accuracy. Due to the lack of strong constraints on the scene's composition and illumination, we had to exclude segmentation techniques based on thresholding grayscale images. Even though this techniques are generally fast and reliable (with the right images), our typical histogram doesn't have any recognizable separation of modes, therefore grayscale analysis is not a viable option.
+There are many possible approaches to solve this problem, each with different complexity and accuracy. Due to the lack of strong constraints on the scene's composition and illumination, we had to exclude segmentation techniques based on thresholding grayscale images. Even though this techniques are generally fast and reliable (with the right images), our typical image histogram doesn't have any recognizable separation of modes, therefore grayscale analysis is not a viable option.
 
 We decided that the best approach to solve our problem, in terms of complexity and reliability, is to segment the hand starting from the color of the user's skin. The idea is quite simple: find the color of the user's skin and use it as a threshold to binarize the image.
 
@@ -51,9 +51,9 @@ The code responsible for this part can be found [here](https://github.com/Pierfr
 ![sample areas image](https://raw.githubusercontent.com/PierfrancescoSoffritti/Handy/master/pictures/sample_areas.png)
 
 #### Threshold calculation
-The image is first converted to the HSV color space. After some testing this color space resulted the most resisted to changes of shade and tonality of the color, but is not the only option, YCrCb was also giving good results. The most significant advantage of using HSV is the ability to ignore shadows on the hand, simply by ignoring the third channel.
+The image is first converted to the HSV color space. After some testing this color space resulted the most resisted to changes of shade and tonality of the color, but is not the only option, YCrCb was also giving good results. The most significant advantage of using HSV is the ability to ignore shadows on the hand, simply by ignoring the third channel (V).
 
-The samples images are divided in their three channels: H, S and V. For each channel we calculate the mean value, from there low and high threshold values are computed, except for the "value" channel (V).
+The sample images are divided in their three channels: H, S and V. For each channel we calculate the mean value, from there low and high threshold values are computed, except for the "value" channel (V).
 
 After some testing we've found that lowering the low thresholds and increasing the high thresholds by a constant amount yields better results.
 
@@ -81,9 +81,9 @@ The binarization of the frame is done using OpenCV's `inRange` function. The ope
 
 `inRange(hsvInput, Scalar(hLowThreshold, sLowThreshold, vLowThreshold), Scalar(hHighThreshold, sHighThreshold, vHighThreshold), skinMask);`
 
-After the binarization the image resulted a bit noisy, because of false positives. To clean the image and remove the false positives, an opening operator is applied, with a 3x3 circular structuring element.
+After binarization the image resulted a bit noisy, because of false positives. To clean the image and remove the false positives, an opening operator is applied, with a 3x3 circular structuring element.
 
-A dilation is also applied, just in case parts of the hands have been detached after the binarization (sometimes fingers are detached from the hand).
+A dilation is also applied, just in case parts of the hand have been detached after binarization (sometimes fingers are detached from the hand).
 
 ```
 performOpening(skinMask, MORPH_ELLIPSE, { 3, 3 });
@@ -154,7 +154,7 @@ To increase the flexibility of our program we assigned a key to the keyboard (th
 ### Hand contour
 Now that we have the binary image, we use OpenCV's function `findContours` to get the contours of all objects in the image. From these we select the contour with the biggest area. If the binarization of the image has been done correctly, this contour should be the one of our hand.
 
-At this point we look for the smallest convex set containing the hand contour, using the `convexHull` function. We then construct the bounding rectangle of the convex hull. The rectangle can be used to calculate an approximation of the center of the hand and to do scale invariant computations.
+At this point we look for the smallest convex set containing the hand contour, using the `convexHull` function. We then construct the bounding rectangle of the convex hull. The rectangle will be used to calculate an approximation of the center of the hand and to do scale invariant computations.
 
 The code responsible for this part can be found [here](https://github.com/PierfrancescoSoffritti/Handy/blob/master/Handy/FingerCount.cpp).
 
@@ -163,7 +163,7 @@ The points of intersection between the hand contour and convex hull are saved in
 
 Using the `convexityDefects` function, we get all the defects of the contour and we save them in another array. These are the lowest points between one finger and the other. We can use the two arrays to make assumptions about the number of lifted fingers in the image.
 
-`convexityDefects` usually returns more points than we need, therefore we have to filter them. We filter them based on their distance from the center of the bounding rectangle (which approximately corresponds to the center of the hand), so that we keep only the lowest points between each finger. In order to make this process scale invariant, we use the height of the bounding rectangle as reference.
+`convexityDefects` usually returns more points than we need, therefore we have to filter them. We filter them based on their distance from the center of the bounding rectangle (which approximately corresponds to the center of the hand), so that only the lowest points between each finger are kept. In order to make this process scale invariant, we use the height of the bounding rectangle as reference.
 
 Both arrays (farthest points from the convex hull and closest points to the convex hull) are then filtered again, we need exactly one point for each finger tip and one point between each finger. To do that all points are averaged using a chosen neighborhood: for each point, all the points within a certain distance are averaged to a single point.
 
