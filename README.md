@@ -1,5 +1,5 @@
 # Handy
-Handy is a hands detection software written in C++ using OpenCV v3.4.1. The software is capable of recognizing hands in an video and of counting the number of lifted fingers.
+Handy is a hand detection software written in C++ using OpenCV v3.4.1. The software is capable of recognizing hands in an video and of counting the number of lifted fingers.
 
 ## Software assumptions
 A few assumptions have been made:
@@ -8,7 +8,7 @@ A few assumptions have been made:
 3. The user is not moving in the frame (eg: he sits at his desk in front of the camera).
 4. There are no particular constraints on the color of the background, but it should be approximately static (no moving objects/strong changes of illumination in the background).
 
-We decided not to add invasive constraints such as forcing the user to wear gloves, in order to change the color of his hands, or to have a specific illumination in the scene.
+We decided not to add invasive constraints such as forcing the user to wear gloves, in order to change the color of his hand, or to have a specific illumination in the scene.
 
 A demo can be watched [here](https://www.youtube.com/watch?v=z8rWGQyIQAE).
 
@@ -99,7 +99,7 @@ void performOpening(Mat binaryImage, int kernelShape, Point kernelSize) {
 
 ### Remove the user's face
 The skin of the user is now the object in our binary image.
-Along with the user's hands, the user's face is also part of our object. This is obviously not desirable. 
+Along with the user's hand, the user's face is also part of our object. This is obviously not desirable. 
 
 To prevent our algorithm from picking up the face of the user, before the binarization of the image the user's face is detected and removed by drawing a black rectangle over it.
 The problem of face detection is solved using one of the face classifiers provided by OpenCV.
